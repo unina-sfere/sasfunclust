@@ -4,8 +4,7 @@ Title: Sparse and smooth clustering for functional data
 Version: 0.1.0
 Author: Fabio Centofanti
 Maintainer: Fabio Centofanti <fabio.centofanti@unina.it>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Sparse clustering for functional data
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -13,5 +12,9 @@ RoxygenNote: 7.1.1
 LinkingTo: 
     Rcpp,RcppArmadillo
 Imports: 
-    Rcpp,RcppArmadillo,mclust
+    Rcpp,
+    RcppArmadillo,
+    fda,
+    mclust,
+    matrixcalc
 URL: https://github.com/fabiocentofanti/sasfunclust.git
