@@ -1,0 +1,221 @@
+
+loglik <- function(parameters, data, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lambda_s=NA,lambda_l=NA,CLC=FALSE){
+
+  CK=0
+  perc_rankpapp2=NA
+  gamma <- vars$gamma
+  gcov <- vars$gcov
+  curve <- data$curve
+  pi <- parameters$pi
+
+  S <- FullS[data$timeindex,  ]
+
+  N<-length(unique(data$curve))
+  G <- dim(vars$gamma)[2]
+  q <- dim(vars$gamma)[3]
+
+  Gamma <- parameters$Gamma
+  if(!is.na(perc_rankpapp2)){
+    print(det(Gamma))
+    print(2)
+    gsvd <- svd(Gamma)
+    p<-which(cumsum( gsvd$d)/sum( gsvd$d)>=perc_rankpapp2)[1]
+    gsvd$d[ - (1:p)] <- 0
+    Gamma <- gsvd$u %*% diag(gsvd$d) %*% t(gsvd$u)
+    # Gamma=diag(diag(Gamma))
+  }
+  if(is.null(parameters$mu))mu<-t(matrix(parameters$lambda.zero,q,G)+parameters$Lambda%*%t(parameters$alpha))
+  else mu<-parameters$mu
+
+  loglk <- 0
+  # print(det(Gamma))
+  for(i in 1:N){
+    y <- data$x[data$curve == i]
+    Si <- S[data$curve == i,  ]
+    ni <- dim(Si)[1]
+    invvar <- diag(1/rep(parameters$sigma, ni))
+    covx <- Si %*% Gamma %*% t(Si) +solve(invvar)
+    covx_inv<-chol2inv(chol(covx))
+    covx_det<-det(covx)
+    # covx<-diag(diag(covx))
+    temp<-sum(sapply(1:G,function(ll)pi[ll]*(2*base::pi)^(-ni/2)*covx_det^(-1/2)*exp(-(1/2)*t(y-Si%*%t(parameters$mu)[,ll])%*% covx_inv%*%(y-Si%*%t(parameters$mu)[,ll]))))
+    #  print(temp)
+    # temp<-sapply(1:G,function(ll)pi[ll]*mvtnorm::dmvnorm(t(y), mean=Si%*%t(mu)[,ll], covx))
+    # print(sum(temp))
+    loglk=loglk+log(sum(temp))
+    # print(log(sum(temp)))
+
+  }
+
+  if(!is.na(lambda_l)){
+    p_l=lambda_l*t(AW_vec)%*%abs(P_tot%*%matrixcalc::vec(t(parameters$mu)))
+    p_s=lambda_s*sum(sapply(1:G,function(ll)t(parameters$mu)[,ll]%*%W%*%t(parameters$mu)[,ll]))
+    p_pi=CK*if(is.na(sum(sapply(1:G,function(ll)log(pi[ll]))))) is.na(sum(sapply(1:G,function(ll)log(pi[ll])))) else 0
+    # print(paste(p_s," ",p_l, " ",p_pi))
+
+    ploglk<-loglk-p_l-p_s+p_pi
+    if(CLC==TRUE){
+      EN<--sum(sapply(1:G,function(ii)sum(sapply(1:N,function(ll)vars$piigivej[ll,ii]*log(vars$piigivej[ll,ii]+10^-200)))))
+      loglk=-2*loglk+2*EN
+    }
+    out<-round(c(loglk,ploglk[1,1]),digits = 2)
+
+
+  }
+  else{
+    out<-loglk
+  }
+  return(out)
+}
+classify <- function(mod, data_new=NA){
+
+
+  parameters<-mod$parameters
+  vars<-mod$vars
+  if(is.na(data_new))
+    data=mod$data
+
+  gamma <- vars$gamma
+  gcov <- vars$gcov
+  curve <- data$curve
+  pi <- parameters$pi
+  S <- mod$S
+  N<-length(unique(data$curve))
+  G <- dim(vars$gamma)[2]
+  q <- dim(vars$gamma)[3]
+  Gamma <- parameters$Gamma
+
+
+  po_pr<-matrix(0,N,G)
+  for(i in 1:N){
+    y <- data$x[data$curve == i]
+    Si <- S[data$time[data$curve == i],  ]
+    ni <- dim(Si)[1]
+    invvar <- diag(1/rep(parameters$sigma, ni))
+    covx<- Si %*% Gamma %*% t(Si) + solve(invvar)
+    covx_inv<-chol2inv(chol(covx))
+    covx_det<-det(covx)
+    # covx<-diag(diag(covx))
+    temp<-sum(sapply(1:G,function(ll)pi[ll]*(2*base::pi)^(-ni/2)*covx_det^(-1/2)*exp(-(1/2)*t(y-Si%*%t(parameters$mu)[,ll])%*% covx_inv%*%(y-Si%*%t(parameters$mu)[,ll]))))
+    # temp<-sapply(1:G,function(ll)pi[ll]*mvtnorm::dmvnorm(t(y), mean=Si%*%t(parameters$mu)[,ll], covx))
+    po_pr[i,]=temp/sum(temp)
+
+  }
+  if(is.na(data_new))po_pr<-vars$piigivej
+  classes<-apply(po_pr,1,which.max)
+  out<-list(classes=classes,po_pr=po_pr)
+  return(out)
+}
+
+get_ksdrule<-function(par,sds,comb_list,k1,k2,k3){
+
+  lambda_s_g=unique(comb_list[,2])
+  lambda_l_g=unique(comb_list[,3])
+  gamma_ada=unique(comb_list[,4])
+
+
+  new_comb_list3<-list()
+  max_vec_l<-numeric()
+  for (kkk in 1:length(gamma_ada)) {
+
+    kk=1
+    max_vec_nc<-sd_vec_nc<-numeric()
+    new_comb_list<-matrix(0,length(lambda_s_g)*length(lambda_l_g),4)
+
+    for (jj in 1:length(lambda_l_g)) {
+      for (ii in 1:length(lambda_s_g)) {
+        indexes<-which(comb_list[,2]==lambda_s_g[ii]&comb_list[,3]==lambda_l_g[jj]&comb_list[,4]==gamma_ada[kkk])
+        par_index<-par[indexes]
+        sd_index<-sds[indexes]
+        max<-which.max(par_index)
+        onese<-which(par_index[1:(max)]>=par_index[max]-k1*sd_index[max])[1]
+
+        max_vec_nc[kk]<-par_index[onese]
+        sd_vec_nc[kk]<-sd_index[onese]
+
+        new_comb_list[kk,]<-as.numeric(comb_list[indexes[onese],])
+        kk=kk+1
+
+      }
+    }
+    kk=1
+    max_vec_s<-sd_vec_s<-numeric()
+    new_comb_list2<-matrix(0,length(lambda_l_g),4)
+    for (ii in 1:length(lambda_l_g)) {
+      indexes<-which(new_comb_list[,3]==lambda_l_g[ii]&new_comb_list[,4]==gamma_ada[kkk])
+      par_index<-max_vec_nc[indexes]
+      sd_index<-sd_vec_nc[indexes]
+      max<-which.max(par_index)
+
+      onese<-max(which(par_index>=par_index[max]-k2*sd_index[max]))
+      max_vec_s[kk]<-par_index[onese]
+      sd_vec_s[kk]<-sd_index[onese]
+      new_comb_list2[kk,]<-as.numeric(new_comb_list[indexes[onese],])
+      kk=kk+1
+    }
+
+
+
+    par_index<-max_vec_s
+    sd_index<-sd_vec_s
+    max<-which.max(par_index)
+    if(k3*sd_index[max]>0.5*abs(max(par_index)-min(par_index)))lim=0.5*abs(max(par_index)-min(par_index)) else lim=k3*sd_index[max]
+    onese<-max(which(par_index>=par_index[max]-lim))
+    max_vec_l[kkk]<-par_index[onese]
+    sd_vec_l<-sd_index[onese]
+    new_comb_list3[[kkk]]<-as.numeric(new_comb_list2[onese,])
+
+  }
+  ind_max<-which.max(max_vec_l)
+
+  num_clusters_opt<-new_comb_list3[[ind_max]][1]
+  lambda_s_opt<-new_comb_list3[[ind_max]][2]
+  lambda_l_opt<-new_comb_list3[[ind_max]][3]
+  gamma_opt<-new_comb_list3[[ind_max]][4]
+
+  return(c(num_clusters_opt=num_clusters_opt,
+           lambda_s_opt=lambda_s_opt,
+           lambda_l_opt=lambda_l_opt,
+           gamma_opt=gamma_opt))
+}
+
+
+get_zero<-function(mod,mu_fd=NA){
+
+  if(is.na(mu_fd)){
+    K=dim(mod$parameters$mu)[1]
+    FullS <- mod$FullS
+    mu<-mod$parameters$mu
+    P<-mod$P
+    if(K!=1)
+      length(which(abs(t(FullS%*%t(P%*%mu)))<10^-4))/length(t(FullS%*%t(P%*%mu)))
+    else{
+      NA
+    }
+  }
+  else{
+
+    grid<-seq(0,1,length.out = 60)
+    mu<-fda::eval.fd(grid,mu_fd)
+    K=dim(mu)[2]
+    # Get pairwise matrix
+    P<-matrix(0,((K-1)^2+(K-1))/2,K)
+    ind<-c(1,K-1)
+    for (ii in 1:(K-1)) {
+
+      P[ind[1]:ind[2],ii]<-rep(1,length(ind[1]:ind[2]))
+      if(length(ind[1]:ind[2])==1)
+        aa<--1
+      else
+        aa<-diag(rep(-1,length(ind[1]:ind[2])))
+
+      P[ind[1]:ind[2],(ii+1):K]<-aa
+      ind<-ind+c((K-1)-(ii-1),(K-1)-(ii))
+      ind<-c(min(((K-1)^2+(K-1))/2,ind[1]),min(((K-1)^2+(K-1))/2,ind[2]))
+    }
+
+    length(which(abs(P%*%t(mu))==0))/length(abs(P%*%t(mu)))
+  }
+
+
+}

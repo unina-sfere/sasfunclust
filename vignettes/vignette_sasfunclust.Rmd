@@ -1,0 +1,34 @@
+---
+title: "vignette_sasfunclust"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette_sasfunclust}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sasfunclust)
+n_i=100
+train<-simulate_data("Scenario I",n_i=n_i)
+test<-simulate_data("Scenario I",n_i=600)
+
+lambda_s=10^-6
+lambda_l=10^1
+
+
+
+
+#mod_cv_grid_diag<-spfclust_cv(data=train$vec,lambda_l_g = lambda_l_seq,lambda_s_g =lambda_s_seq,num_cluster = 2,K_fold = 5,grid = train$grid,CK=0,maxit=200,q=30,trace=FALSE,pert=NA,k1=0.5,k3 = 0.5,varcon="diagonal",test=test_vec,grid_2 =  test$grid)
+
+
+mod_sparse=sasfclust(data=train$vec,lambda_s = lambda_s,lambda_l =lambda_l,G = 3,grid = train$grid,maxit=5)
+
+```

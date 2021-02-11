@@ -2,54 +2,54 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 get_sigma <- function(x, curve, time, S, piigivej, gcov, n_i, gamma, mu) {
-    .Call('_sasfunclust_get_sigma', PACKAGE = 'sasfunclust', x, curve, time, S, piigivej, gcov, n_i, gamma, mu)
+    .Call(`_sasfunclust_get_sigma`, x, curve, time, S, piigivej, gcov, n_i, gamma, mu)
 }
 
 get_numden <- function(x, curve, time, S, piigivej, gcov, n_i, gamma) {
-    .Call('_sasfunclust_get_numden', PACKAGE = 'sasfunclust', x, curve, time, S, piigivej, gcov, n_i, gamma)
+    .Call(`_sasfunclust_get_numden`, x, curve, time, S, piigivej, gcov, n_i, gamma)
 }
 
 get_Estep <- function(par, data, vars, S, hard, n_i) {
-    .Call('_sasfunclust_get_Estep', PACKAGE = 'sasfunclust', par, data, vars, S, hard, n_i)
+    .Call(`_sasfunclust_get_Estep`, par, data, vars, S, hard, n_i)
 }
 
 norm_fdata_c <- function(v) {
-    .Call('_sasfunclust_norm_fdata_c', PACKAGE = 'sasfunclust', v)
+    .Call(`_sasfunclust_norm_fdata_c`, v)
 }
 
 sum_mat <- function(x, y, z) {
-    .Call('_sasfunclust_sum_mat', PACKAGE = 'sasfunclust', x, y, z)
+    .Call(`_sasfunclust_sum_mat`, x, y, z)
 }
 
 wfun_c <- function(x, k, ktun) {
-    .Call('_sasfunclust_wfun_c', PACKAGE = 'sasfunclust', x, k, ktun)
+    .Call(`_sasfunclust_wfun_c`, x, k, ktun)
 }
 
 sum_fdata_c <- function(x) {
-    .Call('_sasfunclust_sum_fdata_c', PACKAGE = 'sasfunclust', x)
+    .Call(`_sasfunclust_sum_fdata_c`, x)
 }
 
 div_fdata_c <- function(x, k) {
-    .Call('_sasfunclust_div_fdata_c', PACKAGE = 'sasfunclust', x, k)
+    .Call(`_sasfunclust_div_fdata_c`, x, k)
 }
 
 stdandar <- function(x, mu, sig) {
-    .Call('_sasfunclust_stdandar', PACKAGE = 'sasfunclust', x, mu, sig)
+    .Call(`_sasfunclust_stdandar`, x, mu, sig)
 }
 
 dife <- function(resi_new, resi) {
-    .Call('_sasfunclust_dife', PACKAGE = 'sasfunclust', resi_new, resi)
+    .Call(`_sasfunclust_dife`, resi_new, resi)
 }
 
 iteration <- function(x, mu0, sig0, kpsi, ktun, tol, maxit) {
-    .Call('_sasfunclust_iteration', PACKAGE = 'sasfunclust', x, mu0, sig0, kpsi, ktun, tol, maxit)
+    .Call(`_sasfunclust_iteration`, x, mu0, sig0, kpsi, ktun, tol, maxit)
 }
 
 Mwgt_r <- function(x, cc, family) {
-    .Call('_sasfunclust_Mwgt_r', PACKAGE = 'sasfunclust', x, cc, family)
+    .Call(`_sasfunclust_Mwgt_r`, x, cc, family)
 }
 
 iteration_ho <- function(x, mu0, sig0, cc, family, tol, maxit) {
-    .Call('_sasfunclust_iteration_ho', PACKAGE = 'sasfunclust', x, mu0, sig0, cc, family, tol, maxit)
+    .Call(`_sasfunclust_iteration_ho`, x, mu0, sig0, cc, family, tol, maxit)
 }
 

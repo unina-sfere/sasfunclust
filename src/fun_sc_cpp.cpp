@@ -1,7 +1,7 @@
 
+
 // #define RCPP_ARMADILLO_RETURN_COLVEC_AS_VECTOR
 #include <RcppArmadillo.h>
-
 #include <string>
 using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -29,7 +29,7 @@ arma::mat get_sigma(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arm
   arma::vec rep1(n_i.n_elem);
   rep1.ones();
   n_vec.subvec(1,n_i.n_elem)=cumsum(n_i)-rep1;
-   // Rcout<<n_vec<<"\n";
+  // Rcout<<n_vec<<"\n";
   // Rcout<<N<<"\n";
   mu=trans(mu);
   arma::mat sigma(1,1);
@@ -46,7 +46,7 @@ arma::mat get_sigma(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arm
     for (int j=0;j<K;++j){
       arma::mat pp=gamma.tube(i,j);
       sigma(0,0)= sigma(0,0)+piigivej(i,j)*(dot(y-Si*(mu.col(j))-Si*trans(pp),y-Si*(mu.col(j))-Si*trans(pp))+trace(Si*gcov.cols((i)*(q),((i+1)*(q)-1))*trans(Si)));
-      }
+    }
 
   }
 
@@ -75,7 +75,7 @@ List get_numden(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arma::m
   int q = gcov.n_rows;
   arma::mat   sigma(1,1), gammai_vec(K*q,1),y ,sum_num(K*q,1), pij_j(1,1),pp, pro;
   arma::vec n_vec(n_i.n_elem+1),rep1(n_i.n_elem),rep2(n_i.n_elem),pii_vec(K*q);
-  arma::sp_mat Si,matp(K*q,K*q),sum_den(K*q,K*q);
+  arma::mat Si,matp(K*q,K*q),sum_den(K*q,K*q);
 
 
   matp.eye();
@@ -89,13 +89,13 @@ List get_numden(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arma::m
   sum_den.zeros();
 
   for (int i=0;i<N;++i){
-    // Rcout<<i<<"\n";
+    //Rcout<<i<<"\n";
     // Rcout<<(j+1)*n_i(i)-1<<"\n";
     pro= x.rows((n_vec(i))+1,(n_vec(i+1)));
     y = repmat(pro,K,1);
     // Rcout<<y<<"\n";
     Si= S.rows((n_vec(i))+1,(n_vec(i+1)));
-    arma::sp_mat Si_mat(n_i(i)*K,K*q) ;
+    arma::mat Si_mat(n_i(i)*K,K*q) ;
     Si_mat.zeros();
     for(int j=0;j<K;++j){
       // Rcout<<j<<"\n";
@@ -105,7 +105,7 @@ List get_numden(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arma::m
       pii_vec.subvec(j*q,(j+1)*q-1)=repmat(pij_j,q,1);
 
     }
-     pp=gamma.row(i);
+    pp=gamma.row(i);
     gammai_vec=vectorise(trans(pp));
     // Rcout<<gammai_vec<<"\n";
 
@@ -200,7 +200,7 @@ List get_Estep(List par,List data,List vars, arma::mat S, bool hard,arma::vec n_
   arma::vec rep1(n_i.n_elem);
   arma::mat gprod(q,q*N),gcov(q,q*N),y,centx,yrep,covx,diag2,d,gprodi,gamma_row,pirep;
   arma::vec n_vec(n_i.n_elem+1);
-  arma::sp_mat Si;
+  arma::mat Si;
   arma::mat Gamma=par[3];
   arma::mat Cgamma=Gamma;
   Cgamma.zeros();
@@ -221,39 +221,39 @@ List get_Estep(List par,List data,List vars, arma::mat S, bool hard,arma::vec n_
     arma::mat invar(n_i(i),n_i(i)),rep2(n_i(i),n_i(i));
     rep2.eye();
     Si= S.rows((n_vec(i))+1,(n_vec(i+1)));
-   // arma::mat invar(n_vec(i),n_vec(i));
-   y= x.rows((n_vec(i))+1,(n_vec(i+1)));
-   yrep=repmat(y,1,K);
-   invar=diagmat(1/repmat(sigma,n_i(i),1));
+    // arma::mat invar(n_vec(i),n_vec(i));
+    y= x.rows((n_vec(i))+1,(n_vec(i+1)));
+    yrep=repmat(y,1,K);
+    invar=diagmat(1/repmat(sigma,n_i(i),1));
 
 
-   // arma::mat den=;
+    // arma::mat den=;
 
-   Cgamma = Gamma - Gamma * trans(Si) * inv_sympd(rep2 + Si * Gamma* trans(Si)* invar) * invar * Si * Gamma;
-   centx = yrep - Si * mu;
-gamma.row(i)= trans(Cgamma * trans(Si) * invar * centx);
-// pp=Gamma;
-//  Rcout<<pp.is_symmetric()<<"\n";
-covx=Si * Gamma * trans(Si) + inv_sympd(invar);
-diag2=(trans(centx) * inv_sympd(covx) * centx);
-        d = exp( - diag2.diag()/2) % pi;
-        if(d.is_zero()){
-          d(0)=1e-200;
-        }
-        // Rcout<<invar.n_rows<<"\n";
-        piigivej.row(i) = trans(d)/accu(d);
-        // Rcout<<i<<"\n";
-                 if(hard) {
-                    m = d.index_max();
-                    piigivej.row(i).zeros();
-                    piigivej(i,m)=1;
-                  }
-                 gamma_row=gamma.row(i);
-                 pirep=repmat(piigivej.row(i),q,1);
-                 gprodi =  trans(gamma_row) * (gamma_row % trans(pirep)) + Cgamma;
+    Cgamma = Gamma - Gamma * trans(Si) * inv_sympd(rep2 + Si * Gamma* trans(Si)* invar) * invar * Si * Gamma;
+    centx = yrep - Si * mu;
+    gamma.row(i)= trans(Cgamma * trans(Si) * invar * centx);
+    // pp=Gamma;
+    //  Rcout<<pp.is_symmetric()<<"\n";
+    covx=Si * Gamma * trans(Si) + inv_sympd(invar);
+    diag2=(trans(centx) * inv_sympd(covx) * centx);
+    d = exp( - diag2.diag()/2) % pi;
+    if(d.is_zero()){
+      d(0)=1e-200;
+    }
+    // Rcout<<invar.n_rows<<"\n";
+    piigivej.row(i) = trans(d)/accu(d);
+    // Rcout<<i<<"\n";
+    if(hard) {
+      m = d.index_max();
+      piigivej.row(i).zeros();
+      piigivej(i,m)=1;
+    }
+    gamma_row=gamma.row(i);
+    pirep=repmat(piigivej.row(i),q,1);
+    gprodi =  trans(gamma_row) * (gamma_row % trans(pirep)) + Cgamma;
 
-                 gprod.submat(0,i*q,q-1,(i+1)*q-1)=gprodi;
-                 gcov.submat(0,i*q,q-1,(i+1)*q-1)=Cgamma;
+    gprod.submat(0,i*q,q-1,(i+1)*q-1)=gprodi;
+    gcov.submat(0,i*q,q-1,(i+1)*q-1)=Cgamma;
 
 
   }
@@ -374,7 +374,7 @@ List iteration(List x,List mu0,List sig0,double kpsi,double ktun,double tol, int
   List somma_fdata;
 
   double sum_ww;
-  while (dife(0) > tol_mat(0) & iter < maxit) {
+  while ((dife(0) > tol_mat(0)) & (iter < maxit)) {
     // Rcout<<iter<<"\n";
     ++iter;
     data_std=stdandar(x,mu0,sig0);
@@ -422,7 +422,7 @@ List iteration_ho(List x,List mu0,List sig0,arma::mat cc,Rcpp::StringVector fami
   List somma_fdata;
 
   double sum_ww;
-  while (dife(0) > tol_mat(0) & iter < maxit) {
+  while ((dife(0) > tol_mat(0)) & (iter < maxit)) {
     // Rcout<<iter<<"\n";
     ++iter;
     data_std=stdandar(x,mu0,sig0);

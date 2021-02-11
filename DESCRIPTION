@@ -1,10 +1,10 @@
 Package: sasfunclust
 Type: Package
-Title: Sparse and smooth clustering for functional data
+Title: Sparse and smooth functional data clustering
 Version: 0.1.0
 Author: Fabio Centofanti
 Maintainer: Fabio Centofanti <fabio.centofanti@unina.it>
-Description: Sparse clustering for functional data
+Description: This package implements the sparse and smooth functional clustering (SaS-Funclust) method described in Centofanti (2021)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,5 +16,14 @@ Imports:
     RcppArmadillo,
     fda,
     mclust,
-    matrixcalc
+    matrixcalc,
+    MASS,
+    Matrix,
+    factoextra
 URL: https://github.com/fabiocentofanti/sasfunclust.git
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+SystemRequirements: GNU make
+
