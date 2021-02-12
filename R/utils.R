@@ -46,7 +46,6 @@ loglik <- function(parameters, data=NULL, X=NULL, timeindex=NULL,curve=NULL,grid
 
   loglk <- 0
   for(i in 1:N){
-    print(i)
     y <- data$x[data$curve==unique(data$curve)[i]]
     Si <- S[data$curve==unique(data$curve)[i],  ]
     ni <- dim(Si)[1]

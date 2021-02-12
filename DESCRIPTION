@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Fabio Centofanti
 Maintainer: Fabio Centofanti <fabio.centofanti@unina.it>
 Description: This package implements the sparse and smooth functional clustering (SaS-Funclust) method described in Centofanti (2021)
-License: MIT + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
@@ -26,4 +26,3 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 SystemRequirements: GNU make
-

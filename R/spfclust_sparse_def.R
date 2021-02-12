@@ -1,5 +1,31 @@
-
+#' @title SaS-Funclust
+#' @description Perform the sparse and smooth functional clustering (SaS-Funclust)
+#' @param X PARAM_DESCRIPTION, Default: NULL
+#' @param timeindex PARAM_DESCRIPTION, Default: NULL
+#' @param curve PARAM_DESCRIPTION, Default: NULL
+#' @param grid PARAM_DESCRIPTION, Default: NULL
+#' @param q PARAM_DESCRIPTION, Default: 30
+#' @param lambda_l PARAM_DESCRIPTION, Default: 10
+#' @param lambda_s PARAM_DESCRIPTION, Default: 10
+#' @param G PARAM_DESCRIPTION, Default: 2
+#' @param tol PARAM_DESCRIPTION, Default: 10^-7
+#' @param maxit PARAM_DESCRIPTION, Default: 50
+#' @param par_LQA PARAM_DESCRIPTION, Default: list(eps_diff = 1e-06, MAX_iter_LQA = 200, eps_LQA = 1e-05)
+#' @param plot PARAM_DESCRIPTION, Default: F
+#' @param trace PARAM_DESCRIPTION, Default: F
+#' @param init PARAM_DESCRIPTION, Default: 'kmeans'
+#' @param varcon PARAM_DESCRIPTION, Default: 'diagonal'
+#' @param lambda_s_ini PARAM_DESCRIPTION, Default: NULL
+#' @return OUTPUT_DESCRIPTION
 #' @export
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @importFrom matrixcalc vec
+#' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust <-
   function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30, lambda_l = 1e1, lambda_s = 1e1,G = 2,
            tol = 10^-7, maxit = 50,par_LQA=list(eps_diff = 1e-06,MAX_iter_LQA=200,eps_LQA = 1e-05),
@@ -179,7 +205,7 @@ sasfclustinit <-
         points <- matrix(0,N,sum(q))
         lambda_s_i_vec<-numeric()
         for (i in 1:length(unique(data$curve))){
-          print(length(unique(data$curve)))
+
           xi <- data$x[data$curve==unique(data$curve)[i]]
           grid_i <- grid[data$timeindex[data$curve==unique(data$curve)[i]]]
 
@@ -188,7 +214,7 @@ sasfclustinit <-
             Sm.i    = fda::smooth.basis(grid_i, xi, fdPari)
             Gcvsave[i,l] = sum(Sm.i$gcv)
           }
-          lambda_s_i_vec[i]=10^loglam[which.min(Gcvsave[i,])]
+          lambda_s_i_vec[i]=if(is.null(lambda_s_ini)) 10^loglam[which.min(Gcvsave[i,])] else lambda_s_ini
           fdPari  = fda::fdPar(basis_start, Lfdobj=2,lambda_s_i_vec[i])
           points[i,]<-t(fda::smooth.basis(grid_i, xi, fdPari)$fd$coefs)
 
@@ -368,7 +394,7 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 
   if(is.null(X_test)){#If test set is not provided
     parr_fun<-function(ii){
-print(ii)
+
       parameters<-as.numeric(comb_list[ii,])
       G_i<-parameters[1]
       lambda_s_i<-parameters[2]
@@ -402,9 +428,7 @@ print(ii)
           curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))
         }
 
-
         mod<-sasfunclust::sasfclust(X=X_fold,timeindex=timeindex_fold,curve=curve_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
-        #
         l_i[lll]<-loglik(parameters = mod[[1]]$parameters,X=X_i,timeindex=timeindex_i,curve=curve_i,grid=grid_i,vars = mod[[1]]$vars, FullS = mod[[1]]$FullS,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot)[1]
         zeros_vec[lll]<-get_zero(mod[[1]])
         rm(mod)
@@ -448,7 +472,6 @@ print(ii)
       vec_par<-parallel::mclapply(seq(1,length(comb_list[,1])),parr_fun,mc.cores = ncores)
     }
     else if(.Platform$OS.type=="windows"){
-
       cl<-parallel::makeCluster(ncores)
       parallel::clusterEvalQ(cl,library(sasfunclust))
       parallel::clusterExport(cl, c("comb_list","N","X","timeindex","curve","grid","q","maxit","K_fold","init","varcon","tol" ,"par_LQA","plot","trace"),envir = environment())
