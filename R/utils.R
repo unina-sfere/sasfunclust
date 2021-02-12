@@ -1,17 +1,20 @@
-
-loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lambda_s=NA,lambda_l=NA,CLC=FALSE,X=NA,grid=NA){
+#' @export
+loglik <- function(parameters, data=NULL, X=NULL, timeindex=NULL,curve=NULL,grid=NULL, vars, FullS,W=NULL,AW_vec=NULL,P_tot=NULL,lambda_s=NULL,lambda_l=NULL,CLC=FALSE){
   #Compute the log-likelihood and the penalized log-likelihood
-  if(is.na(data[1])){
-    if(is.matrix(X)){
+  if(is.null(data)){
+
+    if(length(dim(X))==2){
       n_obs<-dim(X)[2]
       n_t<-dim(X)[1]
-      if(is.na(grid[1])) grid<-seq(0, 1, length.out = n_t)
+      if(is.null(grid)) grid<-seq(0, 1, length.out = n_t)
       vec<-list(x=matrixcalc::vec(X),timeindex=rep(1:length(grid),n_obs),curve=rep(1:n_obs,each=length(grid)))
     }
-    else if(is.list(X)){
-      n_obs<-length(X)
-      if(is.na(grid[1])) grid<-lapply(1:n_obs,function(ii) seq(0, 1, length.out = length(X[[ii]])))
-      vec<-list(x=matrixcalc::vec(X),timeindex=unlist(lapply(1:n_obs,function(ii)1:length(grid[[ii]]))),curve=unlist(lapply(1:n_obs,function(ii)rep(ii,length(grid[[ii]])))))
+    else if(is.null(dim(X))){
+
+      if(is.null(grid)) stop("For irregularly sampled functional data grid must be provided")
+      if(is.null(timeindex)) stop("For irregularly sampled functional timeindex grid must be provided")
+      if(is.null(curve)) stop("For irregularly sampled functional timeindex curve must be provided")
+      vec<-list(x=as.matrix(X),timeindex=timeindex,curve=curve)
     }
     else{
       stop("No data provided")
@@ -20,7 +23,7 @@ loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lamb
   }
 
   CK=0
-  perc_rankpapp2=NA
+  perc_rankpapp2=NULL
   gamma <- vars$gamma
   gcov <- vars$gcov
   curve <- data$curve
@@ -30,7 +33,7 @@ loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lamb
   G <- dim(vars$gamma)[2]
   q <- dim(vars$gamma)[3]
   Gamma <- parameters$Gamma
-  if(!is.na(perc_rankpapp2)){
+  if(!is.null(perc_rankpapp2)){
     print(det(Gamma))
     print(2)
     gsvd <- svd(Gamma)
@@ -43,8 +46,9 @@ loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lamb
 
   loglk <- 0
   for(i in 1:N){
-    y <- data$x[data$curve == i]
-    Si <- S[data$curve == i,  ]
+    print(i)
+    y <- data$x[data$curve==unique(data$curve)[i]]
+    Si <- S[data$curve==unique(data$curve)[i],  ]
     ni <- dim(Si)[1]
     invvar <- diag(1/rep(parameters$sigma, ni))
     covx <- Si %*% Gamma %*% t(Si) +solve(invvar)
@@ -55,7 +59,7 @@ loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lamb
     loglk=loglk+log(sum(temp))
   }
 
-  if(!is.na(lambda_l)){
+  if(!is.null(lambda_l)|!is.null(lambda_s)){
     p_l=lambda_l*t(AW_vec)%*%abs(P_tot%*%matrixcalc::vec(t(parameters$mu)))
     p_s=lambda_s*sum(sapply(1:G,function(ll)t(parameters$mu)[,ll]%*%W%*%t(parameters$mu)[,ll]))
     p_pi=CK*if(is.na(sum(sapply(1:G,function(ll)log(pi[ll]))))) is.na(sum(sapply(1:G,function(ll)log(pi[ll])))) else 0
@@ -73,11 +77,11 @@ loglik <- function(parameters, data=NA, vars, FullS,W=NA,AW_vec=NA,P_tot=NA,lamb
   }
   return(out)
 }
-classify <- function(mod, data_new=NA){
+classify <- function(mod, data_new=NULL){
   #classification
   parameters<-mod$parameters
   vars<-mod$vars
-  if(is.na(data_new))
+  if(is.null(data_new))
     data=mod$data
   gamma <- vars$gamma
   gcov <- vars$gcov
@@ -90,8 +94,8 @@ classify <- function(mod, data_new=NA){
   Gamma <- parameters$Gamma
   po_pr<-matrix(0,N,G)
   for(i in 1:N){
-    y <- data$x[data$curve == i]
-    Si <- S[data$time[data$curve == i],  ]
+    y <- data$x[data$curve==unique(data$curve)[i]]
+    Si <- S[data$time[data$curve==unique(data$curve)[i]],  ]
     ni <- dim(Si)[1]
     invvar <- diag(1/rep(parameters$sigma, ni))
     covx<- Si %*% Gamma %*% t(Si) + solve(invvar)
@@ -101,7 +105,7 @@ classify <- function(mod, data_new=NA){
     po_pr[i,]=temp/sum(temp)
 
   }
-  if(is.na(data_new))po_pr<-vars$piigivej
+  if(is.null(data_new))po_pr<-vars$piigivej
   classes<-apply(po_pr,1,which.max)
   out<-list(classes=classes,po_pr=po_pr)
   return(out)
@@ -160,10 +164,10 @@ get_msdrule<-function(par,sds,comb_list,m1,m2,m3){
            lambda_l_opt=lambda_l_opt))
 }
 
-
-get_zero<-function(mod,mu_fd=NA){
+#' @export
+get_zero<-function(mod,mu_fd=NULL){
 #Get Fraction of  portion of domain fused
-  if(is.na(mu_fd)){
+  if(is.null(mu_fd)){
     K=dim(mod$parameters$mu)[1]
     FullS <- mod$FullS
     mu<-mod$parameters$mu

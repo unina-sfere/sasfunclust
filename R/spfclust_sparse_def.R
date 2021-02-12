@@ -1,28 +1,31 @@
 
 #' @export
 sasfclust <-
-  function(X=NULL, timeindex=NA,curve=NA,grid = NA, q = 30,lambda_s = 1e1, lambda_l = 1e1, G = 2,
+  function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30, lambda_l = 1e1, lambda_s = 1e1,G = 2,
            tol = 10^-7, maxit = 50,par_LQA=list(eps_diff = 1e-06,MAX_iter_LQA=200,eps_LQA = 1e-05),
-            plot= F,trace=F,init="kmeans",varcon="diagonal",lambda_s_ini=NA)
+            plot= F,trace=F,init="kmeans",varcon="diagonal",lambda_s_ini=NULL)
   {
+
+
     der=2
     gamma_ada=1
     CK=0
     hard = F
-    perc_rankpapp=pert=NA
+    perc_rankpapp=pert=NULL
     if(G==1)lambda_l=0
 
-    if(is.matrix(X)){
+    if(length(dim(X))==2){
       n_obs<-dim(X)[2]
       n_t<-dim(X)[1]
-      if(is.na(grid[1])) grid<-seq(0, 1, length.out = n_t)
+      if(is.null(grid)) grid<-seq(0, 1, length.out = n_t)
+      if(length(grid)!=n_t)  stop("Length grid is wrong!")
       vec<-list(x=matrixcalc::vec(X),timeindex=rep(1:length(grid),n_obs),curve=rep(1:n_obs,each=length(grid)))
     }
-    else if(is.numeric(X)){
-      n_obs<-length(X)
-      if(is.na(grid)) stop("For irregularly sampled functional data grid must be provided")
-      if(is.na(timeindex)) stop("For irregularly sampled functional timeindex grid must be provided")
-      if(is.na(curve)) stop("For irregularly sampled functional timeindex curve must be provided")
+    else if(is.null(dim(X))){
+
+      if(is.null(grid)) stop("For irregularly sampled functional data grid must be provided")
+      if(is.null(timeindex)) stop("For irregularly sampled functional timeindex grid must be provided")
+      if(is.null(curve)) stop("For irregularly sampled functional timeindex curve must be provided")
       vec<-list(x=as.matrix(X),timeindex=timeindex,curve=curve)
     }
     else{
@@ -31,6 +34,7 @@ sasfclust <-
 
     data=vec
     # Initialize the parameters
+
     initfit <- sasfclustinit(data = data, pert = pert, grid = grid,  q = q, G = G,der=der,gamma_ada=gamma_ada,lambda_s_ini=lambda_s_ini,init=init,varcon=varcon)
     parameters <- initfit$parameters
     vars <- initfit$vars
@@ -51,9 +55,11 @@ sasfclust <-
     }
     # Main loop. Iterates between M and E steps and stops when the stopping condition is met.
     lk_old=0
+
     lk_new=loglik (parameters=parameters, data = data, vars=vars, FullS = S,W = W,AW_vec = AW_vec,P_tot = P_tot,lambda_s = lambda_s,lambda_l = lambda_l)
     if (trace)    print(paste("Iteration", 0,": Sigma = ",sigma.new," loglk = ",lk_new[1]," ploglk = ",lk_new[2]))
     lk_new=lk_new[2]
+
     while(abs(lk_old - lk_new) > tol & (ind <= maxit)) {
       parameters <- sasfclustMstep(parameters, data, vars, S, tol, hard,lambda_s,lambda_l,W,AW_vec,P_tot,par_LQA,CK,perc_rankpapp,varcon=varcon)
       vars <- sasfclustEstep(parameters, data, vars, S, hard)
@@ -80,7 +86,8 @@ sasfclust <-
 
     out<-list(mod=mod,
               mean_fd=mean_fd,
-              clus=clus)
+              clus=clus,
+              class="sasfclust")
 
     return(out)
     }
@@ -134,10 +141,10 @@ sasfclustinit <-
 
     ext_break<-c(rep(grid[1],order),breaks,rep(grid[length(grid)],order))
     weights_vec<-rep(diff(ext_break,lag=order)/order,each=((G-1)^2+(G-1))/2)
-    N <- length(table(data$curve))
+    N <- length(unique(data$curve))
 
     # Compute initial estimate of basis coefficients.
-    if(!is.na(pert)){
+    if(!is.null(pert)){
       points <- matrix(0,N,sum(q))
       for (i in 1:N){
         Si <- S[data$curve==i,]
@@ -146,8 +153,8 @@ sasfclustinit <-
       }
     }
     else{
-      d<-sapply(1:N,function(i)length(which(data$curve==i)))
-      e<-lapply(1:N, function(i)data$timeindex[data$curve==i])
+      d<-sapply(1:N,function(i)length(which(data$curve==unique(data$curve)[i])))
+      e<-lapply(1:N, function(i)data$timeindex[data$curve==unique(data$curve)[i]])
 
       if(length(unique(d))==1&length(unique(e))==1){##Regular grid
         basis_start<-basis
@@ -161,8 +168,8 @@ sasfclustinit <-
           Gcvsave[i] = sum(Sm.i$gcv)
 
         }
-        lambda_s=if(is.na(lambda_s_ini))10^loglam[which.min(Gcvsave)]else lambda_s_ini
-        fdPari  = fda::fdPar(basis_start, Lfdobj=2,lambda_s)
+        lambda_s_sm=if(is.null(lambda_s_ini))10^loglam[which.min(Gcvsave)]else lambda_s_ini
+        fdPari  = fda::fdPar(basis_start, Lfdobj=2,lambda_s_sm)
         points<-t(fda::smooth.basis(grid_i, X, fdPari)$fd$coefs)
       }
       else{## Irregular grid
@@ -170,18 +177,19 @@ sasfclustinit <-
         loglam         = seq(-3, 1, 0.25)
         Gcvsave        = matrix(0,N,length(loglam))
         points <- matrix(0,N,sum(q))
-        for (i in 1:N){
-          print(i)
-          xi <- data$x[data$curve==i]
-          grid_i <- grid[data$timeindex[data$curve==i]]
+        lambda_s_i_vec<-numeric()
+        for (i in 1:length(unique(data$curve))){
+          print(length(unique(data$curve)))
+          xi <- data$x[data$curve==unique(data$curve)[i]]
+          grid_i <- grid[data$timeindex[data$curve==unique(data$curve)[i]]]
 
           for(l in 1:length(loglam)){
             fdPari  = fda::fdPar(basis_start, Lfdobj=2, 10^loglam[l])
             Sm.i    = fda::smooth.basis(grid_i, xi, fdPari)
             Gcvsave[i,l] = sum(Sm.i$gcv)
           }
-          lambda_s[i]=10^loglam[which.min(Gcvsave[i,])]
-          fdPari  = fda::fdPar(basis_start, Lfdobj=2,lambda_s[i])
+          lambda_s_i_vec[i]=10^loglam[which.min(Gcvsave[i,])]
+          fdPari  = fda::fdPar(basis_start, Lfdobj=2,lambda_s_i_vec[i])
           points[i,]<-t(fda::smooth.basis(grid_i, xi, fdPari)$fd$coefs)
 
         }
@@ -242,7 +250,7 @@ sasfclustinit <-
       AW_vec<-rep(1,q)
     }
     n <- length(data$curve)
-    n_i<-sapply(1:N,function(ii)length(which(data$curve==ii)))
+    n_i<-sapply(1:N,function(ii)length(which(data$curve==unique(data$curve)[ii])))
     sigma=as.numeric(get_sigma( data$x, data$curve, data$time,  as.matrix(S),  piigivej,  gcov,n_i,gamma,mu))/n
     list(S = S, W = W, AW_vec=AW_vec,P_tot=P_tot,P=P, FullS = FullS, parameters = list(mu=mu_start,sigma=sigma,pi=pi,Gamma=Gamma), vars = list(gamma = gamma,piigivej = piigivej,
                                                                                                                                                gprod = gprod, gcov = gcov ),basis=basis)
@@ -267,7 +275,7 @@ sasfclustMstep <-
       parameters$pi <- rep(1/G, G)
     else parameters$pi <- (apply(vars$piigivej, 2, mean)*N+CK)/(N+G*CK)
     ind <- matrix(rep(c(rep(c(1, rep(0, q - 1)), N), 0), q)[1:(N*q^2)], N * q, q)
-    if(!is.na(perc_rankpapp)){
+    if(!is.null(perc_rankpapp)){
       gsvd <- svd(vars$gprod %*% ind/N)
       p<-which(cumsum( gsvd$d)/sum( gsvd$d)>=perc_rankpapp)[1]
       gsvd$d[ - (1:p)] <- 0
@@ -286,7 +294,7 @@ sasfclustMstep <-
     }
     W_star<-Matrix::Matrix(W_star, sparse = TRUE)
     x <- data$x
-    n_i<-sapply(1:N,function(ii)length(which(curve==ii)))
+    n_i<-sapply(1:N,function(ii)length(which(data$curve==unique(data$curve)[ii])))
     numden<-get_numden( data$x, data$curve, data$time,  as.matrix(S),  piigivej,  gcov,n_i,gamma)
     VY<-Matrix::Matrix(numden[[1]],sparse = TRUE)
     S.den<-Matrix::Matrix(numden[[2]],sparse=TRUE)
@@ -322,7 +330,7 @@ sasfclustEstep <-
   {
     # This function performs the E step of the EM algorithm
     N <- dim(vars$gamma)[1]
-    n_i<-sapply(1:N,function(ii)length(which(data$curve==ii)))
+    n_i<-sapply(1:N,function(ii)length(which(data$curve==unique(data$curve)[ii])))
     parameters$sigma=as.matrix(parameters$sigma)
     parameters$pi=as.matrix(parameters$pi)
     aa<-get_Estep(parameters, data, vars, S, hard,n_i)
@@ -338,25 +346,30 @@ sasfclustEstep <-
 
 
 #' @export
-sasfclust_cv<-function(X=NULL, grid = NA,G_seq=6,lambda_l_g=10^seq(-1,2),lambda_s_g=10^seq(-5,-3),K_fold=5,X_test=NA,test=NA,grid_test=NA,m1=1,m2=0,m3=1,maxit=50,q=30,
-                       init="kmeans",lambda_s_ini=NA,varcon="diagonal",ncores=1,...){
+sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lambda_l_seq=10^seq(-1,2),lambda_s_seq=10^seq(-5,-3),G_seq=2,
+                       tol = 10^-7, maxit = 50,par_LQA=list(eps_diff = 1e-06,MAX_iter_LQA=200,eps_LQA = 1e-05),
+                       plot= F,trace=F,init="kmeans",varcon="diagonal",lambda_s_ini=NULL,
+                       K_fold=5,X_test=NULL,grid_test=NULL,m1=1,m2=0,m3=1,ncores=1,...){
 
-  if(is.matrix(X)){
+  if(length(dim(X))==2){
     N<-dim(X)[2]
   }
-  else if(is.list(X)){
-    N<-length(X)
+  else if(is.null(dim(X))){
+    if(is.null(grid)) stop("For irregularly sampled functional data grid must be provided")
+    if(is.null(timeindex)) stop("For irregularly sampled functional timeindex  must be provided")
+    if(is.null(curve)) stop("For irregularly sampled functional timeindex curve must be provided")
+    if(max(timeindex)>length(grid))  stop("Length grid is wrong!")
+    N<-length(unique(curve))
   }
   else{
     stop("No data provided")
   }
-  comb_list<-expand.grid(G_seq,lambda_s_g,lambda_l_g)
+  comb_list<-expand.grid(G_seq,lambda_s_seq,lambda_l_seq)
 
-  if(is.na(X_test[1])){#If test set is not provided
+  if(is.null(X_test)){#If test set is not provided
     parr_fun<-function(ii){
-      print(ii)
+print(ii)
       parameters<-as.numeric(comb_list[ii,])
-
       G_i<-parameters[1]
       lambda_s_i<-parameters[2]
       lambda_l_i<-parameters[3]
@@ -369,20 +382,35 @@ sasfclust_cv<-function(X=NULL, grid = NA,G_seq=6,lambda_l_g=10^seq(-1,2),lambda_
         ind_fold<-as.numeric(unlist(split_vec[-lll]))
         ind_i<-split_vec[[lll]]
 
-        X_fold<-if(is.matrix(X)) X[,ind_fold] else X[ind_fold]
-        grid_fold<-if(is.matrix(X)) grid else if(is.list(X)) grid[ind_fold] else NA
-        X_i<-if(is.matrix(X)) X[,ind_i] else X[ind_i]
-        grid_i<-if(is.matrix(X)) grid else if(is.list(X)) grid[ind_i] else NA
+        X_fold<-if(length(dim(X))==2) X[,ind_fold]   else if(is.null(dim(X))) as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
+        grid_fold=grid
+        if(length(dim(X))==2){
+          timeindex_fold=curve_fold=NULL
+        }
+        else if(is.null(dim(X))){
+          timeindex_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)timeindex[which(curve==ind_fold[pp])])))
+          curve_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)curve[which(curve==ind_fold[pp])])))
+        }
 
-        mod<-sasfclust(X=X_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,lambda_s_ini=lambda_s_ini,varcon=varcon,...)
+        X_i<-if(length(dim(X))==2) X[,ind_i]   else if(is.null(dim(X))) as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
+        grid_i<-grid
+        if(length(dim(X))==2){
+          timeindex_i=curve_i=NULL
+        }
+        else if(is.null(dim(X))){
+          timeindex_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)timeindex[which(curve==ind_i[pp])])))
+          curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))
+        }
 
-        l_i[lll]<-loglik(parameters = mod[[1]]$parameters,X=X_i,grid=grid_i,vars = mod[[1]]$vars, FullS = mod[[1]]$FullS,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot,
-                         lambda_s = mod[[1]]$lambda_s)[1]
+
+        mod<-sasfunclust::sasfclust(X=X_fold,timeindex=timeindex_fold,curve=curve_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
+        #
+        l_i[lll]<-loglik(parameters = mod[[1]]$parameters,X=X_i,timeindex=timeindex_i,curve=curve_i,grid=grid_i,vars = mod[[1]]$vars, FullS = mod[[1]]$FullS,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot)[1]
         zeros_vec[lll]<-get_zero(mod[[1]])
         rm(mod)
       }
       mean<-mean(l_i)
-      sd<-sd(l_i)/sqrt(K_fold)#
+      sd<-sd(l_i)/sqrt(K_fold)
       zeros<-mean(zeros_vec)
 
       out<-list(mean=mean,
@@ -401,7 +429,7 @@ sasfclust_cv<-function(X=NULL, grid = NA,G_seq=6,lambda_l_g=10^seq(-1,2),lambda_
       G_i<-parameters[1]
       lambda_s_i<-parameters[2]
       lambda_l_i<-parameters[3]
-      mod<-sasfclust(X=X,grid=grid,lambda_l = lambda_l_i,lambda_s =lambda_s_i,maxit=maxit,q=q,G=G_i,...)
+      mod<-sasfclust(X=X,timeindex=timeindex,curve=curve,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,lambda_s_ini=lambda_s_ini,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
       l_i<-loglik(parameters = mod[[1]]$parameters,X = X_test,grid = grid_test,vars = mod[[1]]$vars, FullS = mod[[1]]$S,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot,lambda_s = mod[[1]]$lambda_s,lambda_l = mod[[1]]$lambda_l)[1]
       zeros<-get_zero(mod[[1]])
       mean<-l_i
@@ -414,15 +442,16 @@ sasfclust_cv<-function(X=NULL, grid = NA,G_seq=6,lambda_l_g=10^seq(-1,2),lambda_
   }
 
 
-  if(!is.na(X_test[1]))ncores<-1
-  if(ncores>1){
+  if(!is.null(X_test))ncores<-1
+  if(ncores>0){
     if(.Platform$OS.type=="unix"){
       vec_par<-parallel::mclapply(seq(1,length(comb_list[,1])),parr_fun,mc.cores = ncores)
     }
     else if(.Platform$OS.type=="windows"){
+
       cl<-parallel::makeCluster(ncores)
       parallel::clusterEvalQ(cl,library(sasfunclust))
-      parallel::clusterExport(cl, c("comb_list","N","X","grid","q","grid","maxit","K_fold","init","lambda_s_ini","varcon"),envir = environment())
+      parallel::clusterExport(cl, c("comb_list","N","X","timeindex","curve","grid","q","maxit","K_fold","init","varcon","tol" ,"par_LQA","plot","trace"),envir = environment())
       vec_par<- parallel::parLapply(cl, seq(1,length(comb_list[,1])),parr_fun)
       parallel::stopCluster(cl)
       }
@@ -435,20 +464,21 @@ sasfclust_cv<-function(X=NULL, grid = NA,G_seq=6,lambda_l_g=10^seq(-1,2),lambda_
   zeros<-sapply(vec_par,"[[",3)
   l_opt<-as.numeric(comb_list[max(which(par==max(par))),])
 
-  ksdrule<-get_ksdrule(par,sds,comb_list,m1,m2,m3)
+  ksdrule<-get_msdrule(par,sds,comb_list,m1,m2,m3)
 
   G_opt<-ksdrule[1]
   lambda_s_opt<-ksdrule[2]
   lambda_l_opt<-ksdrule[3]
 
-  out<-list(mod_opt=NA,
+  out<-list(mod_opt=NULL,
             G_opt=G_opt,
             lambda_l_opt=lambda_l_opt,
             lambda_s_opt=lambda_s_opt,
             comb_list=comb_list,
             CV=par,
             CV_sd=sds,
-            zeros=zeros,ms=c(m1,m2,m3))
+            zeros=zeros,ms=c(m1,m2,m3),
+            class="sasfclust_cv")
 
   return(out)
 }
