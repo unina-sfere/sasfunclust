@@ -78,9 +78,10 @@ The result are plotted.
 plot(mod_cv)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" /> By
-using the model selection method described in Centofanti et al. (2021),
-the optimal values of , , and , are , , and , respectively.
+<embed src="man/figures/README-unnamed-chunk-6-1.pdf" width="100%" type="application/pdf" />
+
+By using the model selection method described in Centofanti et
+al. (2021), the optimal values of , , and , are , , and , respectively.
 
 Finally, is applied with , , and fixed to their optimal values.
 
@@ -94,8 +95,8 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 2
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+#> [39] 2 2
 plot(mod)
 ```
 

@@ -66,7 +66,7 @@ lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=
 ```
 
 The result are plotted.
-```{r }
+```{r, dev='pdf',dpi=1000}
 plot(mod_cv)
 ```
 By using the model selection method described in Centofanti et al. (2021), the optimal values of \eqn{G}, \eqn{\lambda_s}, and \eqn{\lambda_l}, are \eqn{2}, \eqn{10^-4}, and \eqn{10^2}, respectively.

@@ -33,7 +33,7 @@ plot<-function(mod,...){
     graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels, srt=90, adj=1, xpd=TRUE)
     graphics::text(x=x, y=par()$usr[4]+0.04*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zeros_i*100)), srt=90, adj=1, xpd=TRUE)
+         labels=as.character(round(zeros_i*100)), srt=90, adj=0, xpd=TRUE)
     graphics::abline(v=which(CV_i==max(CV_i)))
     graphics::abline(h=max(CV_i))
     lamb_s<-unique(comb_list_i[,2])
@@ -77,7 +77,7 @@ plot<-function(mod,...){
     graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels, srt=90, adj=1, xpd=TRUE)
     graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zero_vec*100)), srt=90, adj=1, xpd=TRUE)
+         labels=as.character(round(zero_vec*100)), srt=90, adj=0, xpd=TRUE)
 
     kk=1
     max_vec_s<-sd_vec_s<-zero_vec2<-numeric()
@@ -104,7 +104,7 @@ plot<-function(mod,...){
     graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels_L, srt=90, adj=1, xpd=TRUE)
     graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zero_vec2*100)), srt=90, adj=1, xpd=TRUE)
+         labels=as.character(round(zero_vec2*100)), srt=90, adj=0, xpd=TRUE)
 
   }
   else if(mod$class=="sasfclust"){
