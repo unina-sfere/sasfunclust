@@ -1,5 +1,19 @@
+#' @title Plot results for sasfclust and sasfclust_cv
+#' @description This function plot the estimated cluster mean functions and the classified curves when applied to the output of sasfclust,
+#'  whereas, provides a  cross-validation plot when  applied to the output of sasfclust_cv. For the latter, three plots are shown: the first one displays the CV values as a function of  \code{G}, \code{lambda_s} and \code{lambda_l};
+#'  the second one displays the CV values as a function of \code{lambda_s} and \code{lambda_l} for \code{G} fixed at its optimal value;
+#'   the third one displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
+#'
+#' @param mod The output of either sasfclust or sasfclust_cv.
+#' @param ... Other arguments.
+#'
 #' @export
-plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
+#' @examples
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
+#' plot(mod)
+plot<-function(mod,...){
 
   if(mod$class=="sasfclust_cv"){
     comb_list_i<-mod$comb_list
@@ -7,26 +21,21 @@ plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
     sd_i<-mod$CV_sd
     zeros_i<-mod$zeros
 
-    if(!is.null(lambda_s_min)){
-      comb_list_i<-mod$comb_list[which(mod$comb_list[,2]>=lambda_s_min),1:3]
-      CV_i<-mod$CV[which(mod$comb_list[,2]>=lambda_s_min)]
-      sd_i<-mod$CV_sd[which(mod$comb_list[,2]>=lambda_s_min)]
-      zeros_i<-mod$zeros[which(mod$comb_list[,2]>=lambda_s_min)]
-    }
+
 
     x<-seq(1,length(comb_list_i[,1]))
     labels<-lapply(1:length(comb_list_i[,1]),function(ii){a<-as.character(signif(comb_list_i[ii,],digits = 1));    paste(a[1],a[2],a[3])})
-    layout(matrix(rbind(c(1,1),c(2,3)),2,2))
+    graphics::layout(matrix(rbind(c(1,1),c(2,3)),2,2))
     base::plot(CV_i,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV",ylim=c(min(CV_i)-max(sd_i),max(CV_i)+max(sd_i)),...)
-    points(CV_i,pch=16,cex=0.5,col=2)
-    segments(x-0.1,CV_i+sd_i,x+0.1)
-    segments(x-0.1,CV_i-sd_i,x+0.1)
-    text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
+    graphics::points(CV_i,pch=16,cex=0.5,col=2)
+    graphics::segments(x-0.1,CV_i+sd_i,x+0.1)
+    graphics::segments(x-0.1,CV_i-sd_i,x+0.1)
+    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels, srt=90, adj=1, xpd=TRUE)
-    text(x=x, y=par()$usr[4]+0.04*(par()$usr[4]-par()$usr[3]),
+    graphics::text(x=x, y=par()$usr[4]+0.04*(par()$usr[4]-par()$usr[3]),
          labels=as.character(round(zeros_i*100)), srt=90, adj=1, xpd=TRUE)
-    abline(v=which(CV_i==max(CV_i)))
-    abline(h=max(CV_i))
+    graphics::abline(v=which(CV_i==max(CV_i)))
+    graphics::abline(h=max(CV_i))
     lamb_s<-unique(comb_list_i[,2])
     lamb_L<-unique(comb_list_i[,3])
     num_cluster<-unique(comb_list_i[,1])
@@ -34,9 +43,9 @@ plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
     sds<-sd_i
     zeros<-zeros_i
     comb_list<-comb_list_i
-    if(is.null(m1)) m1<-mod$ms[1]
-    if(is.null(m2)) m2<-mod$ms[2]
-    if(is.null(m3)) m3<-mod$ms[3]
+    m1<-mod$ms[1]
+    m2<-mod$ms[2]
+    m3<-mod$ms[3]
 
     kk=1
     max_vec_nc<-sd_vec_nc<-zero_vec<-numeric()
@@ -62,12 +71,12 @@ plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
 
     labels<-lapply(1:length(new_comb_list[,1]),function(ii){a<-as.character(signif(new_comb_list[ii,],digits = 1));    paste(a[1],a[2],a[3])})
     base::plot(max_vec_nc,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV fixed G",ylim=c(min(max_vec_nc)-max(sd_vec_nc),max(max_vec_nc)+max(sd_vec_nc)))
-    points(max_vec_nc,pch=16,cex=0.5,col=2)
-    segments(x-0.1,max_vec_nc+sd_vec_nc,x+0.1)
-    segments(x-0.1,max_vec_nc-sd_vec_nc,x+0.1)
-    text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
+    graphics::points(max_vec_nc,pch=16,cex=0.5,col=2)
+    graphics::segments(x-0.1,max_vec_nc+sd_vec_nc,x+0.1)
+    graphics::segments(x-0.1,max_vec_nc-sd_vec_nc,x+0.1)
+    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels, srt=90, adj=1, xpd=TRUE)
-    text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
+    graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
          labels=as.character(round(zero_vec*100)), srt=90, adj=1, xpd=TRUE)
 
     kk=1
@@ -89,12 +98,12 @@ plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
 
     labels_L<-lapply(1:length(new_comb_list2[,1]),function(ii){a<-as.character(signif(new_comb_list2[ii,],digits = 1));    paste(a[1],a[2],a[3])})
     base::plot(max_vec_s,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV fixed G and lambda_s",ylim=c(min(max_vec_s)-max(sd_vec_s),max(max_vec_s)+max(sd_vec_s)))
-    points(max_vec_s,pch=16,cex=0.5,col=2)
-    segments(x-0.1,max_vec_s+sd_vec_s,x+0.1)
-    segments(x-0.1,max_vec_s-sd_vec_s,x+0.1)
-    text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
+    graphics::points(max_vec_s,pch=16,cex=0.5,col=2)
+    graphics::segments(x-0.1,max_vec_s+sd_vec_s,x+0.1)
+    graphics::segments(x-0.1,max_vec_s-sd_vec_s,x+0.1)
+    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
          labels=labels_L, srt=90, adj=1, xpd=TRUE)
-    text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
+    graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
          labels=as.character(round(zero_vec2*100)), srt=90, adj=1, xpd=TRUE)
 
   }
@@ -106,16 +115,16 @@ plot<-function(mod,m1=NULL,m2=NULL,m3=NULL,lambda_s_min=NULL,...){
     par(mfrow=c(1,2))
 
     graphics::matplot(grid_eval,eval_mu,ylab = "",xlab="",lty=1:G,type="l",xlim=range,ylim=c(min(mod$mod$data$x),max(mod$mod$data$x)))
-    abline(h=0,col=adjustcolor("grey", alpha = 0.6))
+    graphics::abline(h=0,col=grDevices::adjustcolor("grey", alpha = 0.6))
     graphics::title("Cluster means")
-    legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
+    graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
 
     base::plot(0,type="n",xlim=range,ylim=c(min(mod$mod$data$x),max(mod$mod$data$x)),xlab="",ylab="")
     graphics::title("Classified observations")
     for(ii in 1:length(unique(mod$mod$data$curve))){
-      lines(mod$mod$grid[mod$mod$data$timeindex[which(mod$mod$data$curve==ii)]],mod$mod$data$x[which(mod$mod$data$curve==ii)],col=mod$clus[[1]][ii],lty=mod$clus[[1]][ii])
+      graphics::lines(mod$mod$grid[mod$mod$data$timeindex[which(mod$mod$data$curve==ii)]],mod$mod$data$x[which(mod$mod$data$curve==ii)],col=mod$clus[[1]][ii],lty=mod$clus[[1]][ii])
     }
-    legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
+    graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
 
 
   }

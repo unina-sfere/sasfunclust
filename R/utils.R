@@ -1,5 +1,5 @@
-#' @export
-loglik <- function(parameters, data=NULL, X=NULL, timeindex=NULL,curve=NULL,grid=NULL, vars, FullS,W=NULL,AW_vec=NULL,P_tot=NULL,lambda_s=NULL,lambda_l=NULL,CLC=FALSE){
+
+loglik <- function(parameters, data=NULL, X=NULL, timeindex=NULL,curve=NULL,grid=NULL, vars, FullS,W=NULL,AW_vec=NULL,P_tot=NULL,lambda_s=NULL,lambda_l=NULL){
   #Compute the log-likelihood and the penalized log-likelihood
   if(is.null(data)){
 
@@ -63,10 +63,7 @@ loglik <- function(parameters, data=NULL, X=NULL, timeindex=NULL,curve=NULL,grid
     p_s=lambda_s*sum(sapply(1:G,function(ll)t(parameters$mu)[,ll]%*%W%*%t(parameters$mu)[,ll]))
     p_pi=CK*if(is.na(sum(sapply(1:G,function(ll)log(pi[ll]))))) is.na(sum(sapply(1:G,function(ll)log(pi[ll])))) else 0
     ploglk<-loglk-p_l-p_s+p_pi
-    if(CLC==TRUE){
-      EN<--sum(sapply(1:G,function(ii)sum(sapply(1:N,function(ll)vars$piigivej[ll,ii]*log(vars$piigivej[ll,ii]+10^-200)))))
-      loglk=-2*loglk+2*EN
-    }
+
     out<-round(c(loglk,ploglk[1,1]),digits = 2)
 
 
@@ -86,7 +83,7 @@ classify <- function(mod, data_new=NULL){
   gcov <- vars$gcov
   curve <- data$curve
   pi <- parameters$pi
-  S <- mod$S
+  S <- mod$FullS[data$timeindex,  ]
   N<-length(unique(data$curve))
   G <- dim(vars$gamma)[2]
   q <- dim(vars$gamma)[3]
@@ -163,14 +160,27 @@ get_msdrule<-function(par,sds,comb_list,m1,m2,m3){
            lambda_l_opt=lambda_l_opt))
 }
 
-#' @export
+
 get_zero<-function(mod,mu_fd=NULL){
 #Get Fraction of  portion of domain fused
   if(is.null(mu_fd)){
     K=dim(mod$parameters$mu)[1]
     FullS <- mod$FullS
     mu<-mod$parameters$mu
-    P<-mod$P
+    P<-matrix(0,((K-1)^2+(K-1))/2,K)
+    ind<-c(1,K-1)
+    for (ii in 1:(K-1)) {
+
+      P[ind[1]:ind[2],ii]<-rep(1,length(ind[1]:ind[2]))
+      if(length(ind[1]:ind[2])==1)
+        aa<--1
+      else
+        aa<-diag(rep(-1,length(ind[1]:ind[2])))
+
+      P[ind[1]:ind[2],(ii+1):K]<-aa
+      ind<-ind+c((K-1)-(ii-1),(K-1)-(ii))
+      ind<-c(min(((K-1)^2+(K-1))/2,ind[1]),min(((K-1)^2+(K-1))/2,ind[2]))
+    }
     if(K!=1)
       length(which(abs(t(FullS%*%t(P%*%mu)))<10^-4))/length(t(FullS%*%t(P%*%mu)))
     else{

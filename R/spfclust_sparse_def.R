@@ -1,29 +1,82 @@
-#' @title SaS-Funclust
-#' @description Perform the sparse and smooth functional clustering (SaS-Funclust)
-#' @param X PARAM_DESCRIPTION, Default: NULL
-#' @param timeindex PARAM_DESCRIPTION, Default: NULL
-#' @param curve PARAM_DESCRIPTION, Default: NULL
-#' @param grid PARAM_DESCRIPTION, Default: NULL
-#' @param q PARAM_DESCRIPTION, Default: 30
-#' @param lambda_l PARAM_DESCRIPTION, Default: 10
-#' @param lambda_s PARAM_DESCRIPTION, Default: 10
-#' @param G PARAM_DESCRIPTION, Default: 2
-#' @param tol PARAM_DESCRIPTION, Default: 10^-7
-#' @param maxit PARAM_DESCRIPTION, Default: 50
-#' @param par_LQA PARAM_DESCRIPTION, Default: list(eps_diff = 1e-06, MAX_iter_LQA = 200, eps_LQA = 1e-05)
-#' @param plot PARAM_DESCRIPTION, Default: F
-#' @param trace PARAM_DESCRIPTION, Default: F
-#' @param init PARAM_DESCRIPTION, Default: 'kmeans'
-#' @param varcon PARAM_DESCRIPTION, Default: 'diagonal'
-#' @param lambda_s_ini PARAM_DESCRIPTION, Default: NULL
-#' @return OUTPUT_DESCRIPTION
+#' @title Sparse and Smooth Functional Data Clustering
+#' @description The sparse and smooth functional clustering (SaS-Funclust) allows to cluster a sample of curves
+#'  into homogeneous groups while jointly detecting the most informative portions of domain. (Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>).
+#' @param X For Functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
+#' For Functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
+#'  where the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are elements representing the observations for curve \eqn{k}.
+#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on grid (see below) of curve  \eqn{k}.
+#'  So for example, if the \eqn{k}th curve is observed at time points \eqn{t_l,t_m} of the \code{grid} then the the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} would be \eqn{l,m}, being \eqn{n_k=2}.
+#'  If X is a matrix, timeindex is ignored.
+#' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
+#' If X is a matrix, curve is ignored.
+#' @param grid The vector of time points where the curves are sampled.
+#'  For Functional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#' @param q The dimension of the set of B-spline functions.
+#' @param lambda_l Tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
+#' @param lambda_s Tuning parameter of the smoothness penalty.
+#' @param G The number of clusters.
+#' @param tol The tolerance for the stopping condition of the expectation conditional maximization (ECM) algorithms.
+#' The algorithm stops when the log-likelihood difference between two consecutive iterations is less or equal than \code{tol}.
+#' @param maxit The maximum number of iterations allowed in the ECM algorithm.
+#' @param par_LQA A list of parameters for the local quadratic approximation (LQA) in the ECM algorithm.
+#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below eps_diff are set to zero.
+#'  \code{MAX_iter_LQA} is the maximum number of iterations allowed in the LQA.
+#'  \code{eps_LQA} is the tolerance for the stopping condition of LQA.
+#' @param plot If TRUE, the estimated cluster means are plotted at each iteration of the ECM algorithm. Default is FALSE.
+#' @param trace If TRUE, information are shown at each iteration of the ECM algorithm. Default is FALSE.
+#' @param init It is the way to initialize the ECM algorithm. There are three ways of initialization: "kmeans", "model-based", and "hierarchical", that
+#'  provide initialization through the k-means algorithm,  model-based clustering based on parameterized finite Gaussian mixture model, and  hierarchical clustering, respectively.
+#' Default is "kmeans".
+#' @param varcon A vector of character strings indicating the type of coeffiecient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
+#' "full" means unrestricted cluster coefficient covariance matrices allowed to be different among clusters.
+#' "diagonal" means diagonal cluster coefficient covariance matrices that are equal among clusters.
+#' "equal" means diagonal cluster coefficient covariance matrices, with equal diagonal entries, that are equal among clusters.
+#'  Default is "diagonal".
+#' @param lambda_s_ini The tuning parameter used to obtain the functional data through smoothing B-splines before applying the initialization algorithm.
+#' If NULL a Generalized cross validation procedure is used as described in Ramsay (2005). Default is NULL.
+#' @return   A list containing the following arguments:
+#' \code{mod} that is a list composed by
+#' \itemize{
+#' \item \code{data}: A list containing the vectorized form of \code{X}, \code{timeindex}, and \code{curve}. For Functional data observed over a regular grid \code{timeindex} and \code{curve} are trivially obtained.
+#'
+#' \item \code{parameters}: A list containing all the estimated parameters.
+#'
+#' \item \code{vars}: A list containing results from the Expectation step of the ECM algorithm.
+#'
+#' \item \code{FullS}: The matrix of B-spline computed over \code{grid}.
+#'
+#' \item \code{grid}: The vector of time points where the curves are sampled.
+#'
+#' \item \code{W}: The basis roughness penalty matrix containing the possible inner products of pairs of basis function second derivatives.
+#'
+#' \item \code{AW_vec}: Vectorized version of the diagonal matrix used in the approximation of FAPFP.
+#'
+#' \item \code{P_tot}: Sparse Matrix used to compute all the pairwise comparisons in the FAPFP.
+#'
+#' \item \code{lambda_s}: Tuning parameter of the smoothness penalty.
+#'
+#' \item \code{lambda_l}: Tuning parameter of the FAPFP.
+#'}
+#'
+#'A list, named \code{clus}, containing the following arguments:
+#'\itemize{
+#' \item \code{classes}: The vector of clustering membership.
+#'
+#' \item \code{po_pr}: Posterior probabilities of clustering membership.
+#'}
+#'
+#'\code{mean_fd} The estimated cluster mean functions.
+#'
+#'\code{class} A label for the output type.
 #' @export
+#' @references
+#' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
+#'
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
+#' plot(mod)
 #' @importFrom matrixcalc vec
 #' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust <-
@@ -82,7 +135,7 @@ sasfclust <-
     # Main loop. Iterates between M and E steps and stops when the stopping condition is met.
     lk_old=0
 
-    lk_new=loglik (parameters=parameters, data = data, vars=vars, FullS = S,W = W,AW_vec = AW_vec,P_tot = P_tot,lambda_s = lambda_s,lambda_l = lambda_l)
+    lk_new=loglik (parameters=parameters, data = data, vars=vars, FullS = FullS,W = W,AW_vec = AW_vec,P_tot = P_tot,lambda_s = lambda_s,lambda_l = lambda_l)
     if (trace)    print(paste("Iteration", 0,": Sigma = ",sigma.new," loglk = ",lk_new[1]," ploglk = ",lk_new[2]))
     lk_new=lk_new[2]
 
@@ -90,7 +143,7 @@ sasfclust <-
       parameters <- sasfclustMstep(parameters, data, vars, S, tol, hard,lambda_s,lambda_l,W,AW_vec,P_tot,par_LQA,CK,perc_rankpapp,varcon=varcon)
       vars <- sasfclustEstep(parameters, data, vars, S, hard)
       lk_old<-lk_new
-      lk_i<-loglik (parameters=parameters, data = data, vars=vars, FullS = S,W = W,AW_vec = AW_vec,P_tot = P_tot,lambda_s = lambda_s,lambda_l = lambda_l)
+      lk_i<-loglik (parameters=parameters, data = data, vars=vars, FullS = FullS,W = W,AW_vec = AW_vec,P_tot = P_tot,lambda_s = lambda_s,lambda_l = lambda_l)
       lk_new<--lk_i[2]
       sigma.old <- sigma.new
       sigma.new <- parameters$sigma[1]
@@ -105,8 +158,8 @@ sasfclust <-
       ind <- ind + 1
 
     }
-    mod=list(data=data,parameters = parameters, vars = vars, FullS = FullS,grid=grid,S=S,
-         W=W,AW_vec=AW_vec,P_tot=P_tot,P=P,lambda_s=lambda_s,lambda_l=lambda_l,CK=CK,basis=basis)
+    mod=list(data=data,parameters = parameters, vars = vars, FullS = FullS,grid=grid,
+         W=W,AW_vec=AW_vec,P_tot=P_tot,lambda_s=lambda_s,lambda_l=lambda_l)
     mean_fd<-fda::fd(t(parameters$mu),basis)
     clus<-classify(mod)
 
@@ -371,11 +424,87 @@ sasfclustEstep <-
 
 
 
+#' @title Cross-validation for sasfclust
+#' @description K-fold cross-validation procedure to choose the number of clusters and the tuning parameters for the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>).
+#' @param X For Functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
+#' For Functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
+#'  where the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are elements representing the observations for curve \eqn{k}.
+#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on grid (see below) of curve  \eqn{k}.
+#'  So for example, if the \eqn{k}th curve is observed at time points \eqn{t_l,t_m} of the \code{grid} then the the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} would be \eqn{l,m}, being \eqn{n_k=2}.
+#'  If X is a matrix, timeindex is ignored.
+#' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
+#' If X is a matrix, curve is ignored.
+#' @param grid The vector of time points where the curves are sampled.
+#'  For Functional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#' @param q The dimension of the set of B-spline functions.
+#' @param lambda_l_seq Sequence of  tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
+#' @param lambda_s_seq sequence of tuning parameter of the smoothness penalty.
+#' @param G_seq Sequence of number of clusters.
+#' @param tol The tolerance for the stopping condition of the expectation conditional maximization (ECM) algorithms.
+#' The algorithm stops when the log-likelihood difference between two consecutive iterations is less or equal than \code{tol}.
+#' @param maxit The maximum number of iterations allowed in the ECM algorithm.
+#' @param par_LQA A list of parameters for the local quadratic approximation (LQA) in the ECM algorithm.
+#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below eps_diff are set to zero.
+#'  \code{MAX_iter_LQA} is the maximum number of iterations allowed in the LQA.
+#'  \code{eps_LQA} is the tolerance for the stopping condition of LQA.
+#' @param plot If TRUE, the estimated cluster means are plotted at each iteration of the ECM algorithm. Default is FALSE.
+#' @param trace If TRUE, information are shown at each iteration of the ECM algorithm. Default is FALSE.
+#' @param init It is the way to initialize the ECM algorithm. There are three ways of initialization: "kmeans", "model-based", and "hierarchical", that
+#'  provide initialization through the k-means algorithm,  model-based clustering based on parameterized finite Gaussian mixture model, and  hierarchical clustering, respectively.
+#' Default is "kmeans".
+#' @param varcon A vector of character strings indicating the type of coeffiecient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
+#' "full" means unrestricted cluster coefficient covariance matrices allowed to be different among clusters.
+#' "diagonal" means diagonal cluster coefficient covariance matrices that are equal among clusters.
+#' "equal" means diagonal cluster coefficient covariance matrices, with equal diagonal entries, that are equal among clusters.
+#'  Default is "diagonal".
+#' @param lambda_s_ini The tuning parameter used to obtain the functional data through smoothing B-splines before applying the initialization algorithm.
+#' If NULL a Generalized cross validation procedure is used as described in Ramsay (2005). Default is NULL.
+#' @param K_fold Number of folds. Default is 5.
+#' @param X_test Only for functional data observed over a regular grid, a matrix of where  the rows must correspond to argument values and columns to replications of the test set. Default in NULL.
+#' @param grid_test The vector of time points where the test set curves are sampled. Default is NULL.
+#' @param m1 The m-standard devition rule parameter to choose \code{G} for each \code{lambda_s} and \code{lambda_l}.
+#' @param m2 The m-standard devition rule parameter to choose \code{lambda_s} fixed \code{G} for each \code{lambda_l}.
+#' @param m3 The m-standard devition rule parameter to choose \code{lambda_l} fixed \code{G} and \code{lambda_s}.
+#' @param ncores If ncores>1 then parallel computing is used, using \code{ncores cores}.
+
+#' @return   A list containing the following arguments:
+#'  \code{G_opt}: The optimal  numeber of clusters.
+#'
+#'  \code{lambda_l_opt}: The optimal tuning parameter of the FAPFP.
+#'
+#'  \code{lambda_s_opt}: The optimal tuning parameter of the smoothness penalty.
+#'
+#'  \code{comb_list}: The combinations of \code{G},\code{lambda_s} and \code{lambda_l} explored.
+#'
+#'  \code{CV}: The cross-validation values obtaiend for each combination of \code{G},\code{lambda_s} and \code{lambda_l}.
+#'
+#'  \code{CV_sd}: The standard deviations of the cross-validation values.
+#'
+#'  \code{zeros}: Fraction of domain over which the estimated cluster means are fused.
+#'
+#'  \code{ms}: he m-standard devition rule parameters.
+#'
+#'  \code{class}: A label for the output type.
+
 #' @export
+#' @references
+#' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
+#'
+#' @examples
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+#' lambda_s_seq=10^seq(-4,-3)
+#' lambda_l_seq=10^seq(-1,0)
+#' G_seq=2
+#' mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
+#' lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 20,K_fold = 2,q=10)
+#' plot(mod_cv)
+#' @importFrom matrixcalc vec
+#' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lambda_l_seq=10^seq(-1,2),lambda_s_seq=10^seq(-5,-3),G_seq=2,
                        tol = 10^-7, maxit = 50,par_LQA=list(eps_diff = 1e-06,MAX_iter_LQA=200,eps_LQA = 1e-05),
                        plot= F,trace=F,init="kmeans",varcon="diagonal",lambda_s_ini=NULL,
-                       K_fold=5,X_test=NULL,grid_test=NULL,m1=1,m2=0,m3=1,ncores=1,...){
+                       K_fold=5,X_test=NULL,grid_test=NULL,m1=1,m2=0,m3=1,ncores=1){
 
   if(length(dim(X))==2){
     N<-dim(X)[2]
@@ -409,7 +538,7 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
         ind_i<-split_vec[[lll]]
 
         X_fold<-if(length(dim(X))==2) X[,ind_fold]   else if(is.null(dim(X))) as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
-        grid_fold=grid
+        grid_fold<-grid
         if(length(dim(X))==2){
           timeindex_fold=curve_fold=NULL
         }
@@ -428,7 +557,7 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
           curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))
         }
 
-        mod<-sasfunclust::sasfclust(X=X_fold,timeindex=timeindex_fold,curve=curve_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
+        mod<-sasfclust(X=X_fold,timeindex=timeindex_fold,curve=curve_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
         l_i[lll]<-loglik(parameters = mod[[1]]$parameters,X=X_i,timeindex=timeindex_i,curve=curve_i,grid=grid_i,vars = mod[[1]]$vars, FullS = mod[[1]]$FullS,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot)[1]
         zeros_vec[lll]<-get_zero(mod[[1]])
         rm(mod)
@@ -453,8 +582,8 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
       G_i<-parameters[1]
       lambda_s_i<-parameters[2]
       lambda_l_i<-parameters[3]
-      mod<-sasfclust(X=X,timeindex=timeindex,curve=curve,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,lambda_s_ini=lambda_s_ini,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
-      l_i<-loglik(parameters = mod[[1]]$parameters,X = X_test,grid = grid_test,vars = mod[[1]]$vars, FullS = mod[[1]]$S,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot,lambda_s = mod[[1]]$lambda_s,lambda_l = mod[[1]]$lambda_l)[1]
+      mod<-sasfclust(X=X,timeindex=timeindex,curve=curve,grid = grid, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,lambda_s_ini=lambda_s_ini,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
+      l_i<-loglik(parameters = mod[[1]]$parameters,X = X_test,grid = grid_test,vars = mod[[1]]$vars, FullS = mod[[1]]$FullS,W = mod[[1]]$W,AW_vec = mod[[1]]$AW_vec,P_tot = mod[[1]]$P_tot,lambda_s = mod[[1]]$lambda_s,lambda_l = mod[[1]]$lambda_l)[1]
       zeros<-get_zero(mod[[1]])
       mean<-l_i
       sd<-0
@@ -467,7 +596,7 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 
 
   if(!is.null(X_test))ncores<-1
-  if(ncores>0){
+  if(ncores>1){
     if(.Platform$OS.type=="unix"){
       vec_par<-parallel::mclapply(seq(1,length(comb_list[,1])),parr_fun,mc.cores = ncores)
     }
@@ -493,14 +622,14 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
   lambda_s_opt<-ksdrule[2]
   lambda_l_opt<-ksdrule[3]
 
-  out<-list(mod_opt=NULL,
-            G_opt=G_opt,
+  out<-list(G_opt=G_opt,
             lambda_l_opt=lambda_l_opt,
             lambda_s_opt=lambda_s_opt,
             comb_list=comb_list,
             CV=par,
             CV_sd=sds,
-            zeros=zeros,ms=c(m1,m2,m3),
+            zeros=zeros,
+            ms=c(m1,m2,m3),
             class="sasfclust_cv")
 
   return(out)
@@ -508,8 +637,33 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 
 
 
+#' @title Simulate data for functional clustering
+#' @description Simulate data used in the simulation study of Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>.
+#' @param scenario A  character strings indicating the scenario considered. It could be "Scenario I", "Scenario II", and "Scenario III".
+#' @param n_i NUmber of curves in each cluster.
+#' @param nbasis  The dimension of the set of B-spline functions.
+#' @param length_tot Number of evaluation points.
+#' @param var_e Variance of the measurament error.
+#' @param var_b Diagonal entries of the coefficient variance matrix assumed to be diagonal with equal diagonal entries.
+
+
+#' @return   A list containing the following arguments:
+#'  \code{X}: Observation matrix, where  the rows must correspond to argument values and columns to replications.
+#'
+#'  \code{X_fd}: Functional observations without measurament error.
+#'
+#'  \code{mu_fd}: True cluster mean function.
+#'
+#'  \code{grid}: The vector of time points where the curves are sampled.
+#'
+#'  \code{clus}: True cluster membership vector.
+#'
 #' @export
-simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,sd=1,sd2_basis=1) {
+#' @examples
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+#'
+simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,var_e=1,var_b=1) {
 
 
   grid<-seq(0,1,length.out = length_tot)
@@ -521,12 +675,14 @@ simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,sd=1,sd2_basis=1
   if(scenario=="Scenario I"){
     mean_list[[1]]<-c(rep(1.5,nbasis/6),rep(0,nbasis*5/6))
     mean_list[[2]]<-c(rep(-1.5,nbasis/6),rep(0,nbasis*5/6))
+    clus_true<-rep(1:2,each=n_i)
 
   }
   if(scenario=="Scenario II"){
     mean_list[[1]]<-c(rep(3,nbasis/6),rep(1.5,nbasis/6),rep(0,nbasis/6),rep(0,nbasis/2))
     mean_list[[2]]<-c(rep(0,nbasis/6),rep(1.5,nbasis/6),rep(0,nbasis/6),rep(0,nbasis/2))
     mean_list[[3]]<-c(rep(0,nbasis/6),rep(-1.5,nbasis/6),rep(0,nbasis/6),rep(0,nbasis/2))
+    clus_true<-rep(1:3,each=n_i)
 
   }
   if(scenario=="Scenario III"){
@@ -534,38 +690,28 @@ simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,sd=1,sd2_basis=1
     mean_list[[2]]<-c(rep(1.5,nbasis/6),rep(0,nbasis/6),rep(1.5,nbasis/6),rep(0,nbasis/2))
     mean_list[[3]]<-c(rep(-1.5,nbasis/6),rep(0,nbasis/6),rep(-1.5,nbasis/6),rep(0,nbasis/2))
     mean_list[[4]]<-c(rep(-1.5,nbasis/6),rep(-3,nbasis/6),rep(-1.5,nbasis/6),rep(0,nbasis/2))
-
-  }
-
-  if(scenario=="Scenario IV"){
-    mean_list[[1]]<-c(rep(1.5,nbasis/3),rep(3,nbasis/3),rep(1.5,nbasis/3))
-    mean_list[[2]]<-c(rep(1.5,nbasis/3),rep(0,nbasis/3),rep(1.5,nbasis/3))
-    mean_list[[3]]<-c(rep(-1.5,nbasis/3),rep(0,nbasis/3),rep(-1.5,nbasis/3))
-    mean_list[[4]]<-c(rep(-1.5,nbasis/3),rep(-3,nbasis/3),rep(-1.5,nbasis/3))
+    clus_true<-rep(1:4,each=n_i)
 
   }
   mu_fd<-fda::fd(t(do.call("rbind",mean_list)),X_basis)
-  if(length(mean_list)==1)X_coef<-t(MASS::mvrnorm(n_i, mean_list[[1]],diag(nbasis)*sd2_basis))
+  if(length(mean_list)==1)X_coef<-t(MASS::mvrnorm(n_i, mean_list[[1]],diag(nbasis)*var_b))
   else{
-    X_coef<-t(MASS::mvrnorm(n_i, mean_list[[1]],diag(nbasis)*sd2_basis))
+    X_coef<-t(MASS::mvrnorm(n_i, mean_list[[1]],diag(nbasis)*var_b))
     for (ii in 2:length(mean_list)) {
-      X_coef<-cbind(X_coef,t(MASS::mvrnorm(n_i, mean_list[[ii]],diag(nbasis)*sd2_basis)))
+      X_coef<-cbind(X_coef,t(MASS::mvrnorm(n_i, mean_list[[ii]],diag(nbasis)*var_b)))
 
     }
   }
 
   X_fd<-fda::fd(X_coef,X_basis)
   X<-fda::eval.fd(grid,X_fd)
-  X<-X+matrix(stats::rnorm(dim(X)[1]*dim(X)[2],0,sd),dim(X)[1],dim(X)[2])
-  n_obs<-dim(X)[2]
-
-  vec<-list(x=matrixcalc::vec(X),timeindex=rep(1:length(grid),n_obs),curve=rep(1:n_obs,each=length(grid)))
+  X<-X+matrix(stats::rnorm(dim(X)[1]*dim(X)[2],0,sqrt(var_e)),dim(X)[1],dim(X)[2])
 
   out<-list(X=X,
             X_fd=X_fd,
             mu_fd=mu_fd,
             grid=grid,
-            vec=vec)
+            clus=clus_true)
 
   return(out)
 }
