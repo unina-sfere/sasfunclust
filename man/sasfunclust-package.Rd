@@ -6,7 +6,7 @@
 \alias{sasfunclust-package}
 \title{Sparse and smooth functional data clustering}
 \description{
-This package implements the sparse and smooth functional clustering (SaS-Funclust) method described in Centofanti (2021).
+This package implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021)) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain..
 }
 \details{
 \tabular{ll}{
@@ -43,5 +43,5 @@ to add
 \code{\link{sasfclust}},  \code{\link{sasfclust_cv}}
 }
 \author{
-Fabio Centofanti
+Fabio Centofanti, Antonio Lepore, Biagio Palumbo
 }

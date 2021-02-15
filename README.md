@@ -7,23 +7,23 @@
 <!-- badges: end -->
 
 The package sasfunclust implements the the sparse and smooth functional
-clustering (SaS-Funclust) method proposed by Centofanti et al. 2021.
+clustering (SaS-Funclust) method proposed by Centofanti et al. (2021).
 SaS-Funclust is a new method for clustering functional data that aims to
 classify a sample of curves into homogeneous groups while jointly
-detecting the most informative portions of domain. The mothod relies on
+detecting the most informative portions of domain. The method relies on
 a general functional Gaussian mixture model whose parameters are
 estimated by maximizing a log-likelihood function penalized with the
-functional adaptive pairwise fusion penalty and a roughness penalty.
-\#\# Installation
+functional adaptive pairwise fusion penalty (FAPFP) and a roughness
+penalty. The package comprises two main functions and . The former
+performs the SaS-Funclust for fixed number of clusters , tuning
+parameter of the smoothness penalty , and tuning parameter of the FAPFP
+. The latter executes the K-fold cross-validation procedure described in
+Centofanti et al. (2021) to choose , , and .
 
-You can install the released version of sasfunclust from
-[CRAN](https://CRAN.R-project.org) with:
+## Installation
 
-``` r
-install.packages("sasfunclust")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+The development version can be installed from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -32,7 +32,11 @@ devtools::install_github("fabiocentofanti/sasfunclust")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to apply the two main
+functions and on a synthetic dataset generated as as described in the
+simulation study of Centofanti et al. (2021).
+
+We start by loading and attaching the sasfunclust package.
 
 ``` r
 library(sasfunclust)
@@ -44,16 +48,56 @@ library(sasfunclust)
 #> The following object is masked from 'package:base':
 #> 
 #>     plot
-## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+Then, we generate the synthetic dataset as follows.
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date.
+``` r
+n_i=20
+train<-simulate_data("Scenario I",n_i=n_i,var_e = 1,var_b = 0.5^2)
+```
 
-You can also embed plots, for example:
+To apply , sequences of , , and should be defined.
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub!
+``` r
+lambda_s_seq=10^seq(-4,-3)
+lambda_l_seq=10^seq(0,3)
+G_seq=2
+```
+
+And, then, is executed.
+
+``` r
+mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
+lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30,ncores=8)
+```
+
+The result are plotted.
+
+``` r
+plot(mod_cv)
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" /> By
+using the model selection method described in Centofanti et al. (2021),
+the optimal values of , , and , are , , and , respectively.
+
+Finally, is applied with , , and fixed to their optimal values.
+
+``` r
+mod<-sasfclust(X=train$X,grid=train$grid,G=mod_cv$G_opt,
+lambda_l = mod_cv$lambda_l_opt,lambda_s =mod_cv$lambda_s_opt,maxit = 200,q=30)
+```
+
+The cluster membership vector and the plot of the estimated cluster mean
+functions and the classified curves are obtained as follows.
+
+``` r
+print(mod$clus$classes)
+#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+#> [39] 1 2
+plot(mod)
+```
+
+<img src="man/figures/README-example-1.png" width="100%" /> \#
+References
