@@ -4,18 +4,7 @@
 #include <RcppArmadillo.h>
 #include <string>
 using namespace Rcpp;
-// [[Rcpp::depends(RcppArmadillo)]]
-//
-//
-// sigma<-0
-// for(i in 1:N){
-//   y <- data$x[data$curve == i]
-//   Si <- S[data$time[data$curve == i],  ]
-//   ni <- dim(Si)[1]
-//   temp<-sapply(1:K,function(ll)piigivej[i,ll]*(crossprod(y-Si%*%(t(mu)[,ll])-Si%*%gamma[i,ll,])+sum(diag(Si%*%gcov[,((i-1)*(q)+1):((i)*(q))]%*%t(Si)))))
-//   sigma=sigma+(sum(temp))
-// }
-// sigma=sigma/n
+
 
 // [[Rcpp::export]]
 
@@ -52,20 +41,7 @@ arma::mat get_sigma(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arm
 
   return(sigma);
 }
-//
-//
-// sum_num<-matrix(0,K*q,1)
-//   sum_den<-matrix(0,K*q,K*q)
-//   for (ii in 1:N) {
-//     y<-rep(x[data$curve==ii],K)
-//     Si_mat<-bdiag(lapply(1:K,function(oo)S[data$curve==ii,]))
-//     gammai_vec<-vec(t(gamma[ii,,]))
-//     pii_vec<-vec(sapply(1:K,function(ll)piigivej[ii,ll]*rep(1,q)))
-//
-//
-//     sum_num=sum_num+  pii_vec*(t(Si_mat)%*%y-crossprod(Si_mat)%*%gammai_vec)
-//     sum_den=sum_den+  diag(as.numeric(pii_vec))%*%(crossprod(Si_mat))
-//   }
+
 // [[Rcpp::export]]
 
 List get_numden(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arma::mat piigivej, arma::mat gcov,arma::vec n_i,arma::cube gamma){
@@ -120,62 +96,6 @@ List get_numden(arma::mat x,arma::vec curve,arma::vec time, arma::mat S, arma::m
 
   return(out);
 }
-
-
-
-
-
-
-
-
-
-//
-// "fclustEstep" <-
-//   function(parameters, data, vars, S, hard)
-//   {
-// # This function performs the E step of the EM algorithm by
-// # calculating the expected values of gamma and gamma %*% t(gamma)
-// # given the current parameter estimates.
-//     par <- parameters
-//     N <- dim(vars$gamma)[1]
-//     K <- dim(vars$gamma)[2]
-//     q <- dim(vars$gamma)[3]
-//     Gamma <- par$Gamma
-//     mu <- t(par$mu)
-//     vars$gprod <- vars$gcov <- NULL
-//     for(j in 1:N) {
-// # Calculate expected value of gamma.
-//       Sj <- S[data$curve == j,  ]
-//       nj <- sum(data$curve == j)
-//       invvar <- diag(1/rep(par$sigma, nj))
-//       Cgamma <- Gamma - Gamma %*% t(Sj) %*% solve(diag(nj) + Sj %*%
-//         Gamma %*% t(Sj) %*% invvar) %*% invvar %*% Sj %*% Gamma
-//       centx <- data$x[data$curve == j] - Sj %*% mu
-//       vars$gamma[j,  ,  ] <- t(Cgamma %*% t(Sj) %*% invvar %*% centx)
-// # Calculate pi i given j.
-//       covx <- Sj %*% par$Gamma %*% t(Sj) + solve(invvar)
-//       d <- exp( - diag(t(centx) %*% solve(covx) %*% centx)/2) * par$pi
-//       if(all(d==0))d[which.min(diag(t(centx) %*% solve(covx) %*% centx))]=1e-200
-//       vars$piigivej[j,  ] <- d/sum(d)
-//         if(hard) {
-//           m <- order( - d)[1]
-//           vars$piigivej[j,  ] <- 0
-//           vars$piigivej[j, m] <- 1
-//         }
-//
-// # Calculate expected value of gamma %*% t(gamma).
-//         vars$gprod <- cbind(vars$gprod, t(matrix(vars$gamma[j,  ,  ],
-//                                                  K, q)) %*% (matrix(vars$gamma[j,  ,  ], K, q) * vars$
-//                                                    piigivej[j,  ]) + Cgamma)
-//           vars$gcov <- cbind(vars$gcov, Cgamma)
-//     }
-//
-// # Calculate pi_k.
-// # vars$piigivej[vars$piigivej<1e-4 ] <- 0
-//     vars
-//   }
-//
-
 
 
 

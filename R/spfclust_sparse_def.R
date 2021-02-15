@@ -279,7 +279,10 @@ sasfclustinit <-
     if(G > 1){
       if(init=="kmeans")class <-  stats::kmeans(points, G, 1000,nstart = 10000)$cluster
       else if(init=="model-based") class <- mclust::Mclust(points,G,verbose=FALSE,modelNames = "EII")$classification
-      else if(init=="hierarchical")class <-  factoextra::hcut(points,k =G )$cluster
+      else if(init=="hierarchical")class <-  stats::cutree(stats::hclust(stats::dist(points), method = "ward.D2"),k=G)
+      else{
+        stop("Wrong initialization!")
+      }
     }
     else {
       class <- rep(1, N)
