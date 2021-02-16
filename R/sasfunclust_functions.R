@@ -1,16 +1,16 @@
 #' @title Sparse and Smooth Functional Data Clustering
-#' @description The sparse and smooth functional clustering (SaS-Funclust) allows to cluster a sample of curves
-#'  into homogeneous groups while jointly detecting the most informative portions of domain. (Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>).
-#' @param X For Functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
-#' For Functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
+#' @description Sparse and smooth functional clustering (SaS-Funclust) allows to cluster a sample of curves
+#'  into homogeneous groups while jointly detecting the most informative portion of domain. (Centofanti et al., 2021).
+#' @param X For functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
+#' For functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
 #'  where the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are elements representing the observations for curve \eqn{k}.
-#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on grid (see below) of curve  \eqn{k}.
+#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on \code{grid} of curve  \eqn{k}.
 #'  So for example, if the \eqn{k}th curve is observed at time points \eqn{t_l,t_m} of the \code{grid} then the the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} would be \eqn{l,m}, being \eqn{n_k=2}.
 #'  If X is a matrix, timeindex is ignored.
 #' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
 #' If X is a matrix, curve is ignored.
 #' @param grid The vector of time points where the curves are sampled.
-#'  For Functional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#'  For Ffnctional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
 #' @param q The dimension of the set of B-spline functions.
 #' @param lambda_l Tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
 #' @param lambda_s Tuning parameter of the smoothness penalty.
@@ -37,7 +37,7 @@
 #' @return   A list containing the following arguments:
 #' \code{mod} that is a list composed by
 #' \itemize{
-#' \item \code{data}: A list containing the vectorized form of \code{X}, \code{timeindex}, and \code{curve}. For Functional data observed over a regular grid \code{timeindex} and \code{curve} are trivially obtained.
+#' \item \code{data}: A list containing the vectorized form of \code{X}, \code{timeindex}, and \code{curve}. For functional data observed over a regular grid \code{timeindex} and \code{curve} are trivially obtained.
 #'
 #' \item \code{parameters}: A list containing all the estimated parameters.
 #'
@@ -47,7 +47,7 @@
 #'
 #' \item \code{grid}: The vector of time points where the curves are sampled.
 #'
-#' \item \code{W}: The basis roughness penalty matrix containing the possible inner products of pairs of basis function second derivatives.
+#' \item \code{W}: The basis roughness penalty matrix containing the inner products of pairs of basis function second derivatives.
 #'
 #' \item \code{AW_vec}: Vectorized version of the diagonal matrix used in the approximation of FAPFP.
 #'
@@ -60,23 +60,27 @@
 #'
 #'A list, named \code{clus}, containing the following arguments:
 #'\itemize{
-#' \item \code{classes}: The vector of clustering membership.
+#' \item \code{classes}: The vector of cluster membership.
 #'
-#' \item \code{po_pr}: Posterior probabilities of clustering membership.
+#' \item \code{po_pr}: Posterior probabilities of cluster membership.
 #'}
 #'
 #'\code{mean_fd} The estimated cluster mean functions.
 #'
 #'\code{class} A label for the output type.
+#'@seealso \code{\link{sasfclust_cv}}
+#'
 #' @export
 #' @references
 #' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
 #'
 #' @examples
+#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
 #' plot(mod)
+#' }
 #' @importFrom matrixcalc vec
 #' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust <-
@@ -428,20 +432,20 @@ sasfclustEstep <-
 
 
 #' @title Cross-validation for sasfclust
-#' @description K-fold cross-validation procedure to choose the number of clusters and the tuning parameters for the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>).
-#' @param X For Functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
-#' For Functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
+#' @description K-fold cross-validation procedure to choose the number of clusters and the tuning parameters for the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al., 2021).
+#' @param X For functional data observed over a regular grid: a matrix of where  the rows must correspond to argument values and columns to replications.
+#' For functional data observed over an irregular grid:  a vector of length \eqn{\sum_{i=1}^{N}n_i}, with \eqn{N}  the number of curves,
 #'  where the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are elements representing the observations for curve \eqn{k}.
-#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on grid (see below) of curve  \eqn{k}.
+#' @param timeindex A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} provide the locations on \code{grid} of curve  \eqn{k}.
 #'  So for example, if the \eqn{k}th curve is observed at time points \eqn{t_l,t_m} of the \code{grid} then the the entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} would be \eqn{l,m}, being \eqn{n_k=2}.
 #'  If X is a matrix, timeindex is ignored.
 #' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
 #' If X is a matrix, curve is ignored.
 #' @param grid The vector of time points where the curves are sampled.
-#'  For Functional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#'  For Ffnctional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
 #' @param q The dimension of the set of B-spline functions.
-#' @param lambda_l_seq Sequence of  tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
-#' @param lambda_s_seq sequence of tuning parameter of the smoothness penalty.
+#' @param lambda_l_seq Sequence of tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
+#' @param lambda_s_seq Sequence of tuning parameter of the smoothness penalty.
 #' @param G_seq Sequence of number of clusters.
 #' @param tol The tolerance for the stopping condition of the expectation conditional maximization (ECM) algorithms.
 #' The algorithm stops when the log-likelihood difference between two consecutive iterations is less or equal than \code{tol}.
@@ -463,14 +467,15 @@ sasfclustEstep <-
 #' @param lambda_s_ini The tuning parameter used to obtain the functional data through smoothing B-splines before applying the initialization algorithm.
 #' If NULL a Generalized cross validation procedure is used as described in Ramsay (2005). Default is NULL.
 #' @param K_fold Number of folds. Default is 5.
-#' @param X_test Only for functional data observed over a regular grid, a matrix of where  the rows must correspond to argument values and columns to replications of the test set. Default in NULL.
+#' @param X_test Only for functional data observed over a regular grid, a matrix  where  the rows must correspond to argument values and columns to replications of the test set. Default in NULL.
 #' @param grid_test The vector of time points where the test set curves are sampled. Default is NULL.
 #' @param m1 The m-standard devition rule parameter to choose \code{G} for each \code{lambda_s} and \code{lambda_l}.
 #' @param m2 The m-standard devition rule parameter to choose \code{lambda_s} fixed \code{G} for each \code{lambda_l}.
 #' @param m3 The m-standard devition rule parameter to choose \code{lambda_l} fixed \code{G} and \code{lambda_s}.
-#' @param ncores If ncores>1 then parallel computing is used, using \code{ncores cores}.
+#' @param ncores If ncores>1, then parallel computing is used, with \code{ncores} cores. Default is 1.
 
 #' @return   A list containing the following arguments:
+#'
 #'  \code{G_opt}: The optimal  numeber of clusters.
 #'
 #'  \code{lambda_l_opt}: The optimal tuning parameter of the FAPFP.
@@ -485,15 +490,16 @@ sasfclustEstep <-
 #'
 #'  \code{zeros}: Fraction of domain over which the estimated cluster means are fused.
 #'
-#'  \code{ms}: he m-standard devition rule parameters.
+#'  \code{ms}: The m-standard devition rule parameters.
 #'
 #'  \code{class}: A label for the output type.
 
 #' @export
 #' @references
 #' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
-#'
+#' @seealso\code{\link{sasfclust}}
 #' @examples
+#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' lambda_s_seq=10^seq(-4,-3)
@@ -502,6 +508,7 @@ sasfclustEstep <-
 #' mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
 #' lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 20,K_fold = 2,q=10)
 #' plot(mod_cv)
+#' }
 #' @importFrom matrixcalc vec
 #' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lambda_l_seq=10^seq(-1,2),lambda_s_seq=10^seq(-5,-3),G_seq=2,
@@ -641,19 +648,20 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 
 
 #' @title Simulate data for functional clustering
-#' @description Simulate data used in the simulation study of Centofanti et al., 2021,<doi:10.1007/s11634-011-0095-6>.
+#' @description Generate synthetic data as in the simulation study of Centofanti et al., 2021.
 #' @param scenario A  character strings indicating the scenario considered. It could be "Scenario I", "Scenario II", and "Scenario III".
-#' @param n_i NUmber of curves in each cluster.
+#' @param n_i Number of curves in each cluster.
 #' @param nbasis  The dimension of the set of B-spline functions.
 #' @param length_tot Number of evaluation points.
-#' @param var_e Variance of the measurament error.
-#' @param var_b Diagonal entries of the coefficient variance matrix assumed to be diagonal with equal diagonal entries.
+#' @param var_e Variance of the measurement error.
+#' @param var_b Diagonal entries of the coefficient variance matrix, which is assumed to be diagonal, with equal diagonal entries, and the same among clusters.
 
 
 #' @return   A list containing the following arguments:
-#'  \code{X}: Observation matrix, where  the rows must correspond to argument values and columns to replications.
 #'
-#'  \code{X_fd}: Functional observations without measurament error.
+#'  \code{X}: Observation matrix, where  the rows  correspond to argument values and columns to replications.
+#'
+#'  \code{X_fd}: Functional observations without measurement error.
 #'
 #'  \code{mu_fd}: True cluster mean function.
 #'
@@ -663,9 +671,10 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-#'
+#'}
 simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,var_e=1,var_b=1) {
 
 

@@ -28,7 +28,7 @@ The development version can be installed from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("fabiocentofanti/sasfunclust")
+devtools::install_github("unina-sfere/sasfunclust")
 ```
 
 ## Example

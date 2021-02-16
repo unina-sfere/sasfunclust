@@ -1,10 +1,15 @@
 Package: sasfunclust
 Type: Package
-Title: Sparse and smooth functional data clustering
+Title: Sparse and Smooth Functional Fata Clustering
 Version: 0.1.0
-Author: Fabio Centofanti, Antonio Lepore, Biagio Palumbo
-Maintainer: Fabio Centofanti <fabio.centofanti@unina.it>
-Description: This package implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021)) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain..
+Authors@R: c(
+    person("Fabio", "Centofanti", 
+      email = "fabio.centofanti@unina.it", 
+      role = c("cre","aut")),
+    person("Antonio", "Lepore", role = c("aut")), 
+    person("Biagio", "Palumbo", role = c("aut"))
+    )
+Description: Implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021)) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -20,11 +25,11 @@ Imports:
     MASS,
     Matrix,
     factoextra
-URL: https://github.com/fabiocentofanti/sasfunclust.git
+URL: https://github.com/unina-sfere/sasfunclust
+BugReports: https://github.com/unina-sfere/sasfunclust/issues
 Suggests: 
     knitr,
     rmarkdown
-VignetteBuilder: knitr
 SystemRequirements: GNU make
 Roxygen: list(markdown = TRUE)
 

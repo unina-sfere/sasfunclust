@@ -4,12 +4,10 @@
 \alias{plot}
 \title{Plot results for sasfclust and sasfclust_cv}
 \usage{
-plot(mod, ...)
+plot(mod)
 }
 \arguments{
 \item{mod}{The output of either sasfclust or sasfclust_cv.}
-
-\item{...}{Other arguments.}
 }
 \description{
 This function plot the estimated cluster mean functions and the classified curves when applied to the output of sasfclust,
@@ -18,8 +16,10 @@ the second one displays the CV values as a function of \code{lambda_s} and \code
 the third one displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
 }
 \examples{
+\dontrun{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
 plot(mod)
+}
 }

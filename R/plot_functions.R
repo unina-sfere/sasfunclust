@@ -5,15 +5,15 @@
 #'   the third one displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
 #'
 #' @param mod The output of either sasfclust or sasfclust_cv.
-#' @param ... Other arguments.
-#'
 #' @export
 #' @examples
+#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
 #' plot(mod)
-plot<-function(mod,...){
+#' }
+plot<-function(mod){
 
   if(mod$class=="sasfclust_cv"){
     comb_list_i<-mod$comb_list
@@ -26,7 +26,7 @@ plot<-function(mod,...){
     x<-seq(1,length(comb_list_i[,1]))
     labels<-lapply(1:length(comb_list_i[,1]),function(ii){a<-as.character(signif(comb_list_i[ii,],digits = 1));    paste(a[1],a[2],a[3])})
     graphics::layout(matrix(rbind(c(1,1),c(2,3)),2,2))
-    base::plot(CV_i,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV",ylim=c(min(CV_i)-1.01*max(sd_i),max(CV_i)+1.01*max(sd_i)),...)
+    base::plot(CV_i,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV",ylim=c(min(CV_i)-1.01*max(sd_i),max(CV_i)+1.01*max(sd_i)))
     graphics::points(CV_i,pch=16,cex=0.5,col=2)
     graphics::segments(x-0.1,CV_i+sd_i,x+0.1)
     graphics::segments(x-0.1,CV_i-sd_i,x+0.1)
