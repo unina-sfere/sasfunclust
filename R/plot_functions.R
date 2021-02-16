@@ -22,18 +22,21 @@ plot<-function(mod,...){
     zeros_i<-mod$zeros
 
 
-
+    par(mar=c(6,6,6,5))
     x<-seq(1,length(comb_list_i[,1]))
     labels<-lapply(1:length(comb_list_i[,1]),function(ii){a<-as.character(signif(comb_list_i[ii,],digits = 1));    paste(a[1],a[2],a[3])})
     graphics::layout(matrix(rbind(c(1,1),c(2,3)),2,2))
-    base::plot(CV_i,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV",ylim=c(min(CV_i)-max(sd_i),max(CV_i)+max(sd_i)),...)
+    base::plot(CV_i,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV",ylim=c(min(CV_i)-1.01*max(sd_i),max(CV_i)+1.01*max(sd_i)),...)
     graphics::points(CV_i,pch=16,cex=0.5,col=2)
     graphics::segments(x-0.1,CV_i+sd_i,x+0.1)
     graphics::segments(x-0.1,CV_i-sd_i,x+0.1)
-    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
-         labels=labels, srt=90, adj=1, xpd=TRUE)
-    graphics::text(x=x, y=par()$usr[4]+0.04*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zeros_i*100)), srt=90, adj=0, xpd=TRUE)
+    # print(par()$usr)
+    # graphics::text(x=x, y=par()$usr[3]-0.001*(par()$usr[4]-par()$usr[3]),
+    #      labels=labels, srt=90, adj=1, xpd=TRUE,las=2)
+    graphics::mtext(text=labels,side=1,at=x,las=2,cex=0.75)
+    graphics::mtext(text=as.character(round(zeros_i*100)),side=3,at=x,las=2,cex=0.75)
+    # graphics::text(x=x, y=par()$usr[4]+0.001*(par()$usr[4]-par()$usr[3]),
+    #      labels=as.character(round(zeros_i*100)), srt=90, adj=0, xpd=TRUE,cex=0.5)
     graphics::abline(v=which(CV_i==max(CV_i)))
     graphics::abline(h=max(CV_i))
     lamb_s<-unique(comb_list_i[,2])
@@ -68,16 +71,14 @@ plot<-function(mod,...){
 
       }
     }
-
+    x<-seq(1,length(new_comb_list[,1]))
     labels<-lapply(1:length(new_comb_list[,1]),function(ii){a<-as.character(signif(new_comb_list[ii,],digits = 1));    paste(a[1],a[2],a[3])})
-    base::plot(max_vec_nc,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV fixed G",ylim=c(min(max_vec_nc)-max(sd_vec_nc),max(max_vec_nc)+max(sd_vec_nc)))
+    base::plot(max_vec_nc,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV fixed G",ylim=c(min(max_vec_nc)-1.01*max(sd_vec_nc),max(max_vec_nc)+1.01*max(sd_vec_nc)))
     graphics::points(max_vec_nc,pch=16,cex=0.5,col=2)
     graphics::segments(x-0.1,max_vec_nc+sd_vec_nc,x+0.1)
     graphics::segments(x-0.1,max_vec_nc-sd_vec_nc,x+0.1)
-    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
-         labels=labels, srt=90, adj=1, xpd=TRUE)
-    graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zero_vec*100)), srt=90, adj=0, xpd=TRUE)
+    graphics::mtext(text=labels,side=1,at=x,las=2,cex=0.75,)
+    graphics::mtext(text=as.character(round(zero_vec*100)),side=3,at=x,las=2,cex=0.75)
 
     kk=1
     max_vec_s<-sd_vec_s<-zero_vec2<-numeric()
@@ -95,16 +96,14 @@ plot<-function(mod,...){
       new_comb_list2[kk,]<-as.numeric(new_comb_list[indexes[onese],])
       kk=kk+1
     }
-
+    x<-seq(1,length(new_comb_list2[,1]))
     labels_L<-lapply(1:length(new_comb_list2[,1]),function(ii){a<-as.character(signif(new_comb_list2[ii,],digits = 1));    paste(a[1],a[2],a[3])})
     base::plot(max_vec_s,pch=16,cex=0.5,col=2,type="l",xaxt="n",xlab="",ylab="CV fixed G and lambda_s",ylim=c(min(max_vec_s)-max(sd_vec_s),max(max_vec_s)+max(sd_vec_s)))
     graphics::points(max_vec_s,pch=16,cex=0.5,col=2)
     graphics::segments(x-0.1,max_vec_s+sd_vec_s,x+0.1)
     graphics::segments(x-0.1,max_vec_s-sd_vec_s,x+0.1)
-    graphics::text(x=x, y=par()$usr[3]-0.00001*(par()$usr[4]-par()$usr[3]),
-         labels=labels_L, srt=90, adj=1, xpd=TRUE)
-    graphics::text(x=x, y=par()$usr[4]+0.1*(par()$usr[4]-par()$usr[3]),
-         labels=as.character(round(zero_vec2*100)), srt=90, adj=0, xpd=TRUE)
+    graphics::mtext(text=labels_L,side=1,at=x,las=2,cex=0.75)
+    graphics::mtext(text=as.character(round(zero_vec2*100)),side=3,at=x,las=2,cex=0.75)
 
   }
   else if(mod$class=="sasfclust"){
