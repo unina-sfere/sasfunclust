@@ -4,6 +4,9 @@
 # sasfunclust
 
 <!-- badges: start -->
+
+[![R build
+status](https://github.com/fabiocentofanti/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/fabiocentofanti/sasfunclust/actions)
 <!-- badges: end -->
 
 The package sasfunclust implements the the sparse and smooth functional
@@ -34,8 +37,9 @@ devtools::install_github("unina-sfere/sasfunclust")
 ## Example
 
 This is a basic example which shows you how to apply the two main
-functions and on a synthetic dataset generated as as described in the
-simulation study of Centofanti et al. (2021).
+functions `sasfclust` and `sasfclust_cv` on a synthetic dataset
+generated as described in the simulation study of Centofanti et
+al. (2021).
 
 We start by loading and attaching the sasfunclust package.
 
@@ -58,8 +62,8 @@ n_i=20
 train<-simulate_data("Scenario I",n_i=n_i,var_e = 1,var_b = 0.5^2)
 ```
 
-To apply , sequences of *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>
-should be defined.
+To apply `sasfclust_cv`, sequences of *G*, *λ*<sub>*s*</sub>, and
+*λ*<sub>*l*</sub> should be defined.
 
 ``` r
 lambda_s_seq=10^seq(-4,-3)
@@ -67,7 +71,7 @@ lambda_l_seq=10^seq(0,3)
 G_seq=2
 ```
 
-And, then, is executed.
+And, then, `sasfclust_cv` is executed.
 
 ``` r
 mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
@@ -85,8 +89,8 @@ using the model selection method described in Centofanti et al. (2021),
 the optimal values of *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>, are
 2, 10<sup> − 4</sup>, and 10<sup>2</sup>, respectively.
 
-Finally, is applied with *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>
-fixed to their optimal values.
+Finally, `sasfclust` is applied with *G*, *λ*<sub>*s*</sub>, and
+*λ*<sub>*l*</sub> fixed to their optimal values.
 
 ``` r
 mod<-sasfclust(X=train$X,grid=train$grid,G=mod_cv$G_opt,
@@ -98,8 +102,8 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 1
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+#> [39] 2 2
 plot(mod)
 ```
 
