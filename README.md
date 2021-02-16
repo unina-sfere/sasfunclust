@@ -8,7 +8,7 @@
 [![R build
 status](https://github.com/unina-sfere/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/unina-sfere/sasfunclust/actions)
 [![Travis build
-status](https://travis-ci.com/unina-sfere/sasfunclust.svg?branch=master)](https://travis-ci.com/unina-sfere/sasfunclust)
+status](https://travis-ci.com/unina-sfere/sasfunclust.svg?token=zEVZzMQzEwHdN1bmyHeE&branch=main)](https://travis-ci.com/unina-sfere/sasfunclust)
 <!-- badges: end --> The package sasfunclust implements the the sparse
 and smooth functional clustering (SaS-Funclust) method proposed by
 Centofanti et al. (2021). SaS-Funclust is a new method for clustering
