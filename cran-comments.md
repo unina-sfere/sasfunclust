@@ -1,10 +1,10 @@
 ## Test environments
-* local Windows 10 installation, R 4.0.2
-* ubuntu 16.04 (on travis-ci), R 4.0.2
-* GitHub Actions (ubuntu-16.04):  oldrel, 4.0.2, devel
-* GitHub Actions (windows): release, 3.6
+* local Windows 10 (local): R 4.0.2
+* ubuntu 16.04 (on travis-ci): R 4.0.2
+* GitHub Actions (ubuntu-16.04):  oldrel, R 4.0.2, devel
+* GitHub Actions (windows): release, R 3.6
 * Github Actions (macOS): release
-* win-builder: devel
+* win-builder: devel, oldrel, release
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
