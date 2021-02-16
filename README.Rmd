@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 ```
 
 # sasfunclust 
-
 <!-- badges: start -->
 [![R build status](https://github.com/unina-sfere/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/unina-sfere/sasfunclust/actions)
 [![Travis build status](https://travis-ci.com/unina-sfere/sasfunclust.svg?token=zEVZzMQzEwHdN1bmyHeE&branch=main)](https://travis-ci.com/unina-sfere/sasfunclust)
@@ -63,7 +62,7 @@ G_seq=2
 And, then, `sasfclust_cv` is executed.
 ```{r }
 mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
-lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 2,q=30)
+lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30)
 ```
 
 The results are plotted.
