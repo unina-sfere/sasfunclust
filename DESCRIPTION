@@ -1,6 +1,6 @@
 Package: sasfunclust
 Type: Package
-Title: Sparse and Smooth Functional Fata Clustering
+Title: Sparse and Smooth Functional Clustering
 Version: 0.1.0
 Authors@R: c(
     person("Fabio", "Centofanti", 
@@ -18,7 +18,6 @@ LinkingTo:
     Rcpp,RcppArmadillo
 Imports: 
     Rcpp,
-    RcppArmadillo,
     fda,
     mclust,
     matrixcalc,
