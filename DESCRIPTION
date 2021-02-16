@@ -22,8 +22,7 @@ Imports:
     mclust,
     matrixcalc,
     MASS,
-    Matrix,
-    factoextra
+    Matrix
 URL: https://github.com/unina-sfere/sasfunclust
 BugReports: https://github.com/unina-sfere/sasfunclust/issues
 Suggests: 
