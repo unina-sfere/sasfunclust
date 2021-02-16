@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# sasfunclust
+# sasfunclust 
 
 <!-- badges: start -->
 [![R build status](https://github.com/unina-sfere/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/unina-sfere/sasfunclust/actions)

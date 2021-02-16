@@ -6,9 +6,9 @@
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/fabiocentofanti/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/fabiocentofanti/sasfunclust/actions)
+status](https://github.com/unina-sfere/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/unina-sfere/sasfunclust/actions)
 [![Travis build
-status](https://travis-ci.com/fabiocentofanti/sasfunclust.svg?branch=master)](https://travis-ci.com/fabiocentofanti/sasfunclust)
+status](https://travis-ci.com/unina-sfere/sasfunclust.svg?branch=master)](https://travis-ci.com/unina-sfere/sasfunclust)
 <!-- badges: end -->
 
 The package sasfunclust implements the the sparse and smooth functional
@@ -104,8 +104,8 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 1
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+#> [39] 2 2
 plot(mod)
 ```
 
