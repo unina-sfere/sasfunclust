@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R build status](https://github.com/fabiocentofanti/sasfunclust/workflows/R-CMD-check/badge.svg)](https://github.com/fabiocentofanti/sasfunclust/actions)
+[![Travis build status](https://travis-ci.com/fabiocentofanti/sasfunclust.svg?branch=master)](https://travis-ci.com/fabiocentofanti/sasfunclust)
 <!-- badges: end -->
 
 The package  sasfunclust implements the the sparse and smooth functional clustering (SaS-Funclust) method proposed by Centofanti et al. (2021).
