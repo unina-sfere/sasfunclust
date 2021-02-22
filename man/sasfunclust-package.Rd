@@ -13,7 +13,7 @@ Implements the sparse and smooth functional clustering (SaS-Funclust) method (Ce
 Package: \tab sasfunclust\cr
 Type: \tab Package\cr
 Version: \tab 0.1.0 \cr
-Date: \tab  2021-02-16 \cr
+Date: \tab  2021-02-22 \cr
 License: \tab GPL-3\cr
 }
 }
