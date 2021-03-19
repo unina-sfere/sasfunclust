@@ -106,7 +106,6 @@ classify <- function(mod, data_new=NULL){
   out<-list(classes=classes,po_pr=po_pr)
   return(out)
 }
-
 get_msdrule<-function(par,sds,comb_list,m1,m2,m3){
   #Component-wise cross validation procedure
   lambda_s_g=unique(comb_list[,2])
@@ -159,8 +158,6 @@ get_msdrule<-function(par,sds,comb_list,m1,m2,m3){
            lambda_s_opt=lambda_s_opt,
            lambda_l_opt=lambda_l_opt))
 }
-
-
 get_zero<-function(mod,mu_fd=NULL){
 #Get Fraction of  portion of domain fused
   if(is.null(mu_fd)){

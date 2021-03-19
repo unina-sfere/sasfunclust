@@ -169,8 +169,8 @@ sasfclust <-
 
     out<-list(mod=mod,
               mean_fd=mean_fd,
-              clus=clus,
-              class="sasfclust")
+              clus=clus)
+    class(out)<-"sasfclust"
 
     return(out)
     }
@@ -639,8 +639,8 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
             CV=par,
             CV_sd=sds,
             zeros=zeros,
-            ms=c(m1,m2,m3),
-            class="sasfclust_cv")
+            ms=c(m1,m2,m3))
+  class(out)<-"sasfclust_cv"
 
   return(out)
 }

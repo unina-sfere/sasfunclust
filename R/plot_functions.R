@@ -1,21 +1,24 @@
-#' @title Plot results for sasfclust and sasfclust_cv
-#' @description This function plot the estimated cluster mean functions and the classified curves when applied to the output of sasfclust,
-#'  whereas, provides a  cross-validation plot when  applied to the output of sasfclust_cv. For the latter, three plots are shown: the first one displays the CV values as a function of  \code{G}, \code{lambda_s} and \code{lambda_l};
+#' @title Plot the results of the cross-validation for the Sas-funclust method
+#' @description This function  provides three plots: the first one displays the CV values as a function of  \code{G}, \code{lambda_s} and \code{lambda_l};
 #'  the second one displays the CV values as a function of \code{lambda_s} and \code{lambda_l} for \code{G} fixed at its optimal value;
 #'   the third one displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
 #'
-#' @param mod The output of either sasfclust or sasfclust_cv.
+#' @param mod The output of   `sasfclust_cv`.
 #' @export
 #' @examples
 #' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
-#' plot(mod)
+#' lambda_s_seq=10^seq(-4,-3)
+#' lambda_l_seq=10^seq(-1,0)
+#' G_seq=2
+#' mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
+#' lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 20,K_fold = 2,q=10)
+#' plot(mod_cv)
 #' }
-plot<-function(mod){
+plot.sasfclust_cv<-function(mod){
 
-  if(mod$class=="sasfclust_cv"){
+  if(class(mod)=="sasfclust_cv"){
     comb_list_i<-mod$comb_list
     CV_i<-mod$CV
     sd_i<-mod$CV_sd
@@ -106,7 +109,27 @@ plot<-function(mod){
     graphics::mtext(text=as.character(round(zero_vec2*100)),side=3,at=x,las=2,cex=0.75)
 
   }
-  else if(mod$class=="sasfclust"){
+
+
+
+
+
+}
+
+#' @title Plot the results of the Sas-funclust method
+#' @description This function povides plots of the estimated cluster mean functions and of the classified curves.
+#'
+#' @param mod The output of   `sasfclust`.
+#' @export
+#' @examples
+#' \dontrun{
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
+#' plot(mod)
+#' }
+plot.sasfclust<-function(mod){
+
     G<-dim(mod$mean_fd$coefs)[2]
     range<-mod$mean_fd$basis$rangeval
     grid_eval<-seq(range[1],range[2],length.out = 500)
@@ -126,7 +149,7 @@ plot<-function(mod){
     graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
 
 
-  }
+
 
 
 
