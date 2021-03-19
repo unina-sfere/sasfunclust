@@ -162,6 +162,7 @@ get_zero<-function(mod,mu_fd=NULL){
 #Get Fraction of  portion of domain fused
   if(is.null(mu_fd)){
     K=dim(mod$parameters$mu)[1]
+    if(K!=1){
     FullS <- mod$FullS
     mu<-mod$parameters$mu
     P<-matrix(0,((K-1)^2+(K-1))/2,K)
@@ -178,8 +179,9 @@ get_zero<-function(mod,mu_fd=NULL){
       ind<-ind+c((K-1)-(ii-1),(K-1)-(ii))
       ind<-c(min(((K-1)^2+(K-1))/2,ind[1]),min(((K-1)^2+(K-1))/2,ind[2]))
     }
-    if(K!=1)
+
       length(which(abs(t(FullS%*%t(P%*%mu)))<10^-4))/length(t(FullS%*%t(P%*%mu)))
+    }
     else{
       NA
     }

@@ -547,24 +547,26 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
         ind_fold<-as.numeric(unlist(split_vec[-lll]))
         ind_i<-split_vec[[lll]]
 
-        X_fold<-if(length(dim(X))==2) X[,ind_fold]   else if(is.null(dim(X))) as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
+        X_fold<-as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
         grid_fold<-grid
         if(length(dim(X))==2){
           timeindex_fold=curve_fold=NULL
         }
         else if(is.null(dim(X))){
           timeindex_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)timeindex[which(curve==ind_fold[pp])])))
-          curve_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)curve[which(curve==ind_fold[pp])])))
+          curve_fold= as.numeric(unlist(lapply(1:length(ind_fold),function(pp)rep(pp,length(which(curve==ind_fold[pp]))))))
+          # curve_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)curve[which(curve==ind_fold[pp])])))
         }
 
-        X_i<-if(length(dim(X))==2) X[,ind_i]   else if(is.null(dim(X))) as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
+        X_i<- as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
         grid_i<-grid
         if(length(dim(X))==2){
           timeindex_i=curve_i=NULL
         }
         else if(is.null(dim(X))){
           timeindex_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)timeindex[which(curve==ind_i[pp])])))
-          curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))
+          curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)rep(pp,length(which(curve==ind_i[pp]))))))
+          # curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))
         }
 
         mod<-sasfclust(X=X_fold,timeindex=timeindex_fold,curve=curve_fold,grid = grid_fold, lambda_l = lambda_l_i,lambda_s =lambda_s_i,G=G_i,maxit=maxit,q=q,init=init,varcon=varcon,tol = tol,par_LQA=par_LQA,plot=plot,trace=trace)
