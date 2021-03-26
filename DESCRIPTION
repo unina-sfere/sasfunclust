@@ -30,4 +30,3 @@ Suggests:
     rmarkdown
 SystemRequirements: GNU make
 Roxygen: list(markdown = TRUE)
-

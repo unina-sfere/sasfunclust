@@ -46,14 +46,6 @@ We start by loading and attaching the sasfunclust package.
 
 ``` r
 library(sasfunclust)
-#> 
-#> Attaching package: 'sasfunclust'
-#> The following object is masked from 'package:graphics':
-#> 
-#>     plot
-#> The following object is masked from 'package:base':
-#> 
-#>     plot
 ```
 
 Then, we generate the synthetic dataset as follows.
@@ -76,7 +68,7 @@ And, then, `sasfclust_cv` is executed.
 
 ``` r
 mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
-lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30)
+lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30,ncores = 7)
 ```
 
 The results are plotted.
@@ -103,8 +95,8 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-#> [39] 2 2
+#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+#> [39] 1 1
 plot(mod)
 ```
 

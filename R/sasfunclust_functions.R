@@ -547,23 +547,25 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
         ind_fold<-as.numeric(unlist(split_vec[-lll]))
         ind_i<-split_vec[[lll]]
 
-        X_fold<-as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
         grid_fold<-grid
         if(length(dim(X))==2){
+          X_fold<-X[,ind_fold]#as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
           timeindex_fold=curve_fold=NULL
         }
         else if(is.null(dim(X))){
+          X_fold<-as.numeric(unlist(lapply(1:length(ind_fold),function(pp)X[which(curve==ind_fold[pp])])))
           timeindex_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)timeindex[which(curve==ind_fold[pp])])))
           curve_fold= as.numeric(unlist(lapply(1:length(ind_fold),function(pp)rep(pp,length(which(curve==ind_fold[pp]))))))
           # curve_fold=as.numeric(unlist(lapply(1:length(ind_fold),function(pp)curve[which(curve==ind_fold[pp])])))
         }
 
-        X_i<- as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
         grid_i<-grid
         if(length(dim(X))==2){
+          X_i<- X[,ind_i]#as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
           timeindex_i=curve_i=NULL
         }
         else if(is.null(dim(X))){
+          X_i<- as.numeric(unlist(lapply(1:length(ind_i),function(pp)X[which(curve==ind_i[pp])])))
           timeindex_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)timeindex[which(curve==ind_i[pp])])))
           curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)rep(pp,length(which(curve==ind_i[pp]))))))
           # curve_i=as.numeric(unlist(lapply(1:length(ind_i),function(pp)curve[which(curve==ind_i[pp])])))

@@ -62,7 +62,7 @@ G_seq=2
 And, then, `sasfclust_cv` is executed.
 ```{r }
 mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
-lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30)
+lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30,ncores = 7)
 ```
 
 The results are plotted.
