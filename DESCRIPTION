@@ -1,7 +1,7 @@
 Package: sasfunclust
 Type: Package
 Title: Sparse and Smooth Functional Clustering
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(
     person("Fabio", "Centofanti", 
       email = "fabio.centofanti@unina.it", 

@@ -68,7 +68,7 @@ And, then, `sasfclust_cv` is executed.
 
 ``` r
 mod_cv<-sasfclust_cv(X=train$X,grid=train$grid,G_seq=G_seq,
-lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 200,K_fold = 5,q=30,ncores = 7)
+lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 50,K_fold = 5,q=30,ncores = 7)
 ```
 
 The results are plotted.
@@ -87,7 +87,7 @@ Finally, `sasfclust` is applied with *G*, *λ*<sub>*s*</sub>, and
 
 ``` r
 mod<-sasfclust(X=train$X,grid=train$grid,G=mod_cv$G_opt,
-lambda_l = mod_cv$lambda_l_opt,lambda_s =mod_cv$lambda_s_opt,maxit = 200,q=30)
+lambda_l = mod_cv$lambda_l_opt,lambda_s =mod_cv$lambda_s_opt,maxit = 50,q=30)
 ```
 
 The cluster membership vector and the plot of the estimated cluster mean
@@ -95,10 +95,12 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 1
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+#> [39] 2 2
 plot(mod)
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" /> \#
-References
+References \* Centofanti F., Lepore A., Palumbo B. (2021)
+<!-- Sparse and Smooth Functional Data Clustering --> *arXiv preprint
+arXiv:*
