@@ -77,7 +77,7 @@ The results are plotted.
 plot(mod_cv)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" /> By
+<img src="./man/figures/README-unnamed-chunk-6-1.png" width="100%" /> By
 using the model selection method described in Centofanti et al. (2021),
 the optimal values of *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>, are
 2, 10<sup> − 4</sup>, and 10<sup>2</sup>, respectively.
@@ -95,12 +95,12 @@ functions and the classified curves are obtained as follows.
 
 ``` r
 print(mod$clus$classes)
-#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-#> [39] 2 2
 plot(mod)
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" /> \#
-References \* Centofanti F., Lepore A., Palumbo B. (2021)
-<!-- Sparse and Smooth Functional Data Clustering --> *arXiv preprint
-arXiv:*
+<img src="./man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+# References
+
+-   Centofanti, F., Lepore, A., & Palumbo, B. (2021). Sparse and Smooth
+    Functional Data Clustering. *arXiv preprint arXiv:2103.15224*.

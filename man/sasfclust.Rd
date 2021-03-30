@@ -122,6 +122,10 @@ plot(mod)
 }
 }
 \references{
+Centofanti, F., Lepore, A., & Palumbo, B. (2021).
+Sparse and Smooth Functional Data Clustering.
+\emph{arXiv preprint arXiv:2103.15224}.
+
 Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
 }
 \seealso{
