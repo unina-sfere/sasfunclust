@@ -9,10 +9,9 @@ Authors@R: c(
     person("Antonio", "Lepore", role = c("aut")), 
     person("Biagio", "Palumbo", role = c("aut"))
     )
-Description: Implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021) <https://arxiv.org/abs/2103.15224>) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain.
+Description: Implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021) <arXiv:2103.15224>) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain.
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.1.1
 LinkingTo: 
     Rcpp,RcppArmadillo

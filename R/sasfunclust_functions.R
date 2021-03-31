@@ -10,7 +10,7 @@
 #' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
 #' If X is a matrix, curve is ignored.
 #' @param grid The vector of time points where the curves are sampled.
-#'  For Ffnctional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#'  For Functional data observed over an irregular grid, \code{timeindex} and \code{grid} provide the time points for each curve.
 #' @param q The dimension of the set of B-spline functions.
 #' @param lambda_l Tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
 #' @param lambda_s Tuning parameter of the smoothness penalty.
@@ -19,7 +19,7 @@
 #' The algorithm stops when the log-likelihood difference between two consecutive iterations is less or equal than \code{tol}.
 #' @param maxit The maximum number of iterations allowed in the ECM algorithm.
 #' @param par_LQA A list of parameters for the local quadratic approximation (LQA) in the ECM algorithm.
-#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below eps_diff are set to zero.
+#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below \code{eps_diff} are set to zero.
 #'  \code{MAX_iter_LQA} is the maximum number of iterations allowed in the LQA.
 #'  \code{eps_LQA} is the tolerance for the stopping condition of LQA.
 #' @param plot If TRUE, the estimated cluster means are plotted at each iteration of the ECM algorithm. Default is FALSE.
@@ -27,7 +27,7 @@
 #' @param init It is the way to initialize the ECM algorithm. There are three ways of initialization: "kmeans", "model-based", and "hierarchical", that
 #'  provide initialization through the k-means algorithm,  model-based clustering based on parameterized finite Gaussian mixture model, and  hierarchical clustering, respectively.
 #' Default is "kmeans".
-#' @param varcon A vector of character strings indicating the type of coeffiecient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
+#' @param varcon A vector of character strings indicating the type of coefficient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
 #' "full" means unrestricted cluster coefficient covariance matrices allowed to be different among clusters.
 #' "diagonal" means diagonal cluster coefficient covariance matrices that are equal among clusters.
 #' "equal" means diagonal cluster coefficient covariance matrices, with equal diagonal entries, that are equal among clusters.
@@ -445,7 +445,7 @@ sasfclustEstep <-
 #' @param curve  A vector of length \eqn{\sum_{i=1}^{N}n_i}. The entries from  \eqn{\sum_{i=1}^{k-1}(n_i+1)} to \eqn{\sum_{i=1}^{k}n_i} are equal to  \eqn{k}.
 #' If X is a matrix, curve is ignored.
 #' @param grid The vector of time points where the curves are sampled.
-#'  For Ffnctional data observed over an irregular grid, timeindex and grid provide the time points for each curve.
+#'  For Functional data observed over an irregular grid, \code{timeindex} and \code{grid} provide the time points for each curve.
 #' @param q The dimension of the set of B-spline functions.
 #' @param lambda_l_seq Sequence of tuning parameter of the functional adaptive pairwise fusion penalty (FAPFP).
 #' @param lambda_s_seq Sequence of tuning parameter of the smoothness penalty.
@@ -454,7 +454,7 @@ sasfclustEstep <-
 #' The algorithm stops when the log-likelihood difference between two consecutive iterations is less or equal than \code{tol}.
 #' @param maxit The maximum number of iterations allowed in the ECM algorithm.
 #' @param par_LQA A list of parameters for the local quadratic approximation (LQA) in the ECM algorithm.
-#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below eps_diff are set to zero.
+#'  \code{eps_diff} is the lower bound for the coefficient mean differences, values below \code{eps_diff} are set to zero.
 #'  \code{MAX_iter_LQA} is the maximum number of iterations allowed in the LQA.
 #'  \code{eps_LQA} is the tolerance for the stopping condition of LQA.
 #' @param plot If TRUE, the estimated cluster means are plotted at each iteration of the ECM algorithm. Default is FALSE.
@@ -462,7 +462,7 @@ sasfclustEstep <-
 #' @param init It is the way to initialize the ECM algorithm. There are three ways of initialization: "kmeans", "model-based", and "hierarchical", that
 #'  provide initialization through the k-means algorithm,  model-based clustering based on parameterized finite Gaussian mixture model, and  hierarchical clustering, respectively.
 #' Default is "kmeans".
-#' @param varcon A vector of character strings indicating the type of coeffiecient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
+#' @param varcon A vector of character strings indicating the type of coefficient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
 #' "full" means unrestricted cluster coefficient covariance matrices allowed to be different among clusters.
 #' "diagonal" means diagonal cluster coefficient covariance matrices that are equal among clusters.
 #' "equal" means diagonal cluster coefficient covariance matrices, with equal diagonal entries, that are equal among clusters.
@@ -472,14 +472,14 @@ sasfclustEstep <-
 #' @param K_fold Number of folds. Default is 5.
 #' @param X_test Only for functional data observed over a regular grid, a matrix  where  the rows must correspond to argument values and columns to replications of the test set. Default in NULL.
 #' @param grid_test The vector of time points where the test set curves are sampled. Default is NULL.
-#' @param m1 The m-standard devition rule parameter to choose \code{G} for each \code{lambda_s} and \code{lambda_l}.
-#' @param m2 The m-standard devition rule parameter to choose \code{lambda_s} fixed \code{G} for each \code{lambda_l}.
-#' @param m3 The m-standard devition rule parameter to choose \code{lambda_l} fixed \code{G} and \code{lambda_s}.
-#' @param ncores If ncores>1, then parallel computing is used, with \code{ncores} cores. Default is 1.
+#' @param m1 The m-standard deviation rule parameter to choose \code{G} for each \code{lambda_s} and \code{lambda_l}.
+#' @param m2 The m-standard deviation rule parameter to choose \code{lambda_s} fixed \code{G} for each \code{lambda_l}.
+#' @param m3 The m-standard deviation rule parameter to choose \code{lambda_l} fixed \code{G} and \code{lambda_s}.
+#' @param ncores If \code{ncores}>1, then parallel computing is used, with \code{ncores} cores. Default is 1.
 
 #' @return   A list containing the following arguments:
 #'
-#'  \code{G_opt}: The optimal  numeber of clusters.
+#'  \code{G_opt}: The optimal  number of clusters.
 #'
 #'  \code{lambda_l_opt}: The optimal tuning parameter of the FAPFP.
 #'
@@ -487,13 +487,13 @@ sasfclustEstep <-
 #'
 #'  \code{comb_list}: The combinations of \code{G},\code{lambda_s} and \code{lambda_l} explored.
 #'
-#'  \code{CV}: The cross-validation values obtaiend for each combination of \code{G},\code{lambda_s} and \code{lambda_l}.
+#'  \code{CV}: The cross-validation values obtained for each combination of \code{G},\code{lambda_s} and \code{lambda_l}.
 #'
 #'  \code{CV_sd}: The standard deviations of the cross-validation values.
 #'
 #'  \code{zeros}: Fraction of domain over which the estimated cluster means are fused.
 #'
-#'  \code{ms}: The m-standard devition rule parameters.
+#'  \code{ms}: The m-standard deviation rule parameters.
 #'
 #'  \code{class}: A label for the output type.
 

@@ -36,7 +36,7 @@ If X is a matrix, timeindex is ignored.}
 If X is a matrix, curve is ignored.}
 
 \item{grid}{The vector of time points where the curves are sampled.
-For Ffnctional data observed over an irregular grid, timeindex and grid provide the time points for each curve.}
+For Functional data observed over an irregular grid, \code{timeindex} and \code{grid} provide the time points for each curve.}
 
 \item{q}{The dimension of the set of B-spline functions.}
 
@@ -52,7 +52,7 @@ The algorithm stops when the log-likelihood difference between two consecutive i
 \item{maxit}{The maximum number of iterations allowed in the ECM algorithm.}
 
 \item{par_LQA}{A list of parameters for the local quadratic approximation (LQA) in the ECM algorithm.
-\code{eps_diff} is the lower bound for the coefficient mean differences, values below eps_diff are set to zero.
+\code{eps_diff} is the lower bound for the coefficient mean differences, values below \code{eps_diff} are set to zero.
 \code{MAX_iter_LQA} is the maximum number of iterations allowed in the LQA.
 \code{eps_LQA} is the tolerance for the stopping condition of LQA.}
 
@@ -64,7 +64,7 @@ The algorithm stops when the log-likelihood difference between two consecutive i
 provide initialization through the k-means algorithm,  model-based clustering based on parameterized finite Gaussian mixture model, and  hierarchical clustering, respectively.
 Default is "kmeans".}
 
-\item{varcon}{A vector of character strings indicating the type of coeffiecient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
+\item{varcon}{A vector of character strings indicating the type of coefficient covariance matrix. Three values are allowed: "full", "diagonal", and "equal".
 "full" means unrestricted cluster coefficient covariance matrices allowed to be different among clusters.
 "diagonal" means diagonal cluster coefficient covariance matrices that are equal among clusters.
 "equal" means diagonal cluster coefficient covariance matrices, with equal diagonal entries, that are equal among clusters.

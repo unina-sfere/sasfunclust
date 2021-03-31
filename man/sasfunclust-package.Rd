@@ -6,7 +6,7 @@
 \alias{sasfunclust-package}
 \title{Sparse and smooth functional data clustering}
 \description{
-Implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021) <https://arxiv.org/abs/2103.15224>) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain.
+Implements the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al. (2021) <arXiv:2103.15224>) that aims to classify a sample of curves into homogeneous groups while jointly detecting the most informative portions of domain.
 }
 \details{
 \tabular{ll}{
