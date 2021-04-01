@@ -16,8 +16,8 @@ sasfclust_cv(
   tol = 10^-7,
   maxit = 50,
   par_LQA = list(eps_diff = 1e-06, MAX_iter_LQA = 200, eps_LQA = 1e-05),
-  plot = F,
-  trace = F,
+  plot = FALSE,
+  trace = FALSE,
   init = "kmeans",
   varcon = "diagonal",
   lambda_s_ini = NULL,
@@ -119,7 +119,7 @@ A list containing the following arguments:
 K-fold cross-validation procedure to choose the number of clusters and the tuning parameters for the sparse and smooth functional clustering (SaS-Funclust) method (Centofanti et al., 2021).
 }
 \examples{
-\dontrun{
+\donttest{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 lambda_s_seq=10^seq(-4,-3)

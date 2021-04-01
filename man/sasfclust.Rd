@@ -114,12 +114,10 @@ Sparse and smooth functional clustering (SaS-Funclust) allows to cluster a sampl
 into homogeneous groups while jointly detecting the most informative portion of domain. (Centofanti et al., 2021).
 }
 \examples{
-\dontrun{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
+mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 5,q=10)
 plot(mod)
-}
 }
 \references{
 Centofanti, F., Lepore, A., & Palumbo, B. (2021).

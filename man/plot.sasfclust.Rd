@@ -12,7 +12,10 @@
 \arguments{
 \item{x}{The output of  either \code{sasfclust} or \code{sasfclust_cv}.}
 
-\item{...}{Not yet implemented.}
+\item{...}{No additional parameters, called for side effects.}
+}
+\value{
+No return value, called for side effects.
 }
 \description{
 This function provides plots of the estimated cluster mean functions and of the classified curves when applied to the output of \code{sasfclust}, whereas
@@ -21,7 +24,7 @@ the second plot displays the CV values as a function of \code{lambda_s} and \cod
 the third plot displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
 }
 \examples{
-\dontrun{
+\donttest{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 lambda_s_seq=10^seq(-4,-3)

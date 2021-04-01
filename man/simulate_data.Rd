@@ -43,8 +43,6 @@ A list containing the following arguments:
 Generate synthetic data as in the simulation study of Centofanti et al., 2021.
 }
 \examples{
-\dontrun{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-}
 }

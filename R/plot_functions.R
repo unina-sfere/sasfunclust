@@ -6,12 +6,13 @@
 #'   the third plot displays the CV values as a function of \code{lambda_l} for \code{G} and \code{lambda_s}   fixed at their optimal value.
 #'
 #' @param x The output of  either `sasfclust` or `sasfclust_cv`.
-#' @param ... Not yet implemented.
+#' @param ... No additional parameters, called for side effects.
+#' @return No return value, called for side effects.
 #' @rdname plot.sasfclust
 #' @method plot sasfclust_cv
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' lambda_s_seq=10^seq(-4,-3)
@@ -23,12 +24,16 @@
 #' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
 #' plot(mod)
 #' }
+
 plot.sasfclust<-function(x,...){
   mod=x
   G<-dim(mod$mean_fd$coefs)[2]
   range<-mod$mean_fd$basis$rangeval
   grid_eval<-seq(range[1],range[2],length.out = 500)
   eval_mu<- fda::eval.fd(grid_eval,mod$mean_fd)
+
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit( graphics::par(oldpar))
   graphics::par(mfrow=c(1,2))
 
   graphics::matplot(grid_eval,eval_mu,ylab = "",xlab="",lty=1:G,type="l",xlim=range,ylim=c(min(mod$mod$data$x),max(mod$mod$data$x)))
@@ -43,7 +48,7 @@ plot.sasfclust<-function(x,...){
   }
   graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
 
-
+  return(NULL)
 }
 
 
@@ -61,8 +66,10 @@ plot.sasfclust_cv<-function(x,...){
   sd_i<-mod$CV_sd
   zeros_i<-mod$zeros
 
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit( graphics::par(oldpar))
   graphics::par(mar=c(6,6,6,5))
+
   x<-seq(1,length(comb_list_i[,1]))
   labels<-lapply(1:length(comb_list_i[,1]),function(ii){a<-as.character(signif(comb_list_i[ii,],digits = 1));    paste(a[1],a[2],a[3])})
   graphics::layout(matrix(rbind(c(1,1),c(2,3)),2,2))
@@ -70,13 +77,8 @@ plot.sasfclust_cv<-function(x,...){
   graphics::points(CV_i,pch=16,cex=0.5,col=2)
   graphics::segments(x-0.1,CV_i+sd_i,x+0.1)
   graphics::segments(x-0.1,CV_i-sd_i,x+0.1)
-  # print(par()$usr)
-  # graphics::text(x=x, y=par()$usr[3]-0.001*(par()$usr[4]-par()$usr[3]),
-  #      labels=labels, srt=90, adj=1, xpd=TRUE,las=2)
   graphics::mtext(text=labels,side=1,at=x,las=2,cex=0.75)
   graphics::mtext(text=as.character(round(zeros_i*100)),side=3,at=x,las=2,cex=0.75)
-  # graphics::text(x=x, y=par()$usr[4]+0.001*(par()$usr[4]-par()$usr[3]),
-  #      labels=as.character(round(zeros_i*100)), srt=90, adj=0, xpd=TRUE,cex=0.5)
   graphics::abline(v=which(CV_i==max(CV_i)))
   graphics::abline(h=max(CV_i))
   lamb_s<-unique(comb_list_i[,2])

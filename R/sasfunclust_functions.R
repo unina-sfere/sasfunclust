@@ -78,12 +78,10 @@
 #'
 #' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
 #' @examples
-#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 20,q=10)
+#' mod<-sasfclust(X=train$X,grid=train$grid,lambda_s = 10^-6,lambda_l =10,G = 2,maxit = 5,q=10)
 #' plot(mod)
-#' }
 #' @importFrom matrixcalc vec
 #' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust <-
@@ -96,7 +94,7 @@ sasfclust <-
     der=2
     gamma_ada=1
     CK=0
-    hard = F
+    hard = FALSE
     perc_rankpapp=pert=NULL
     if(G==1)lambda_l=0
 
@@ -399,7 +397,7 @@ sasfclustMstep <-
       diff_mat[diff_mat < par_LQA$eps_diff]<-par_LQA$eps_diff
       V_l<-Matrix::Matrix(diag(as.numeric(AW_vec/(2*diff_mat))),sparse = TRUE)
       mu_vec<-solve(S.den*(1/parameters$sigma)+lambda_s*2*W_star+2*lambda_l*Matrix::t(P_tot)%*%V_l%*%P_tot)%*%VY*(1/parameters$sigma)
-      mu<-matrix(mu_vec,G,q,byrow = T)
+      mu<-matrix(mu_vec,G,q,byrow = TRUE)
       diff_inter<-sum(abs(mu-mu_old))/(sum(abs(mu_old)))
       mu_old<-mu
       z_int=z_int+1
@@ -506,7 +504,7 @@ sasfclustEstep <-
 #' Ramsay, J., Ramsay, J., & Silverman, B. W. (2005). Functional Data Analysis. Springer Science & Business Media.
 #' @seealso\code{\link{sasfclust}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' lambda_s_seq=10^seq(-4,-3)
@@ -520,7 +518,7 @@ sasfclustEstep <-
 #' @importFrom fda create.bspline.basis fd plot.fd
 sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lambda_l_seq=10^seq(-1,2),lambda_s_seq=10^seq(-5,-3),G_seq=2,
                        tol = 10^-7, maxit = 50,par_LQA=list(eps_diff = 1e-06,MAX_iter_LQA=200,eps_LQA = 1e-05),
-                       plot= F,trace=F,init="kmeans",varcon="diagonal",lambda_s_ini=NULL,
+                       plot= FALSE,trace=FALSE,init="kmeans",varcon="diagonal",lambda_s_ini=NULL,
                        K_fold=5,X_test=NULL,grid_test=NULL,m1=1,m2=0,m3=1,ncores=1){
 
   if(length(dim(X))==2){
@@ -682,10 +680,8 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 #'
 #' @export
 #' @examples
-#' \dontrun{
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
-#'}
 simulate_data<-function(scenario,n_i=50,nbasis=30,length_tot=50,var_e=1,var_b=1) {
 
 
