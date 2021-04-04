@@ -24,7 +24,7 @@
 #'
 #' @seealso \code{\link{sasfclust}},  \code{\link{sasfclust_cv}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 # Plot of original functions
 #'
 #' n_i=20

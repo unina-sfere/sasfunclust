@@ -40,9 +40,14 @@ A list containing the following arguments:
 \code{clus}: True cluster membership vector.
 }
 \description{
-Generate synthetic data as in the simulation study of Centofanti et al., 2021.
+Generate synthetic data as in the simulation study of Centofanti et al. (2021).
 }
 \examples{
 library(sasfunclust)
 train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
+}
+\references{
+Centofanti, F., Lepore, A., & Palumbo, B. (2021).
+Sparse and Smooth Functional Data Clustering.
+\emph{arXiv preprint arXiv:2103.15224}.
 }

@@ -13,12 +13,12 @@ Implements the sparse and smooth functional clustering (SaS-Funclust) method (Ce
 Package: \tab sasfunclust\cr
 Type: \tab Package\cr
 Version: \tab 1.0.0 \cr
-Date: \tab  2021-04-01 \cr
+Date: \tab  2021-04-03 \cr
 License: \tab GPL-3\cr
 }
 }
 \examples{
-\dontrun{
+\donttest{
 
 n_i=20
 train<-simulate_data("Scenario I",n_i=n_i,sd = 1,sd2_basis = 0.5^2)

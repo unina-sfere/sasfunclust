@@ -657,7 +657,7 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 
 
 #' @title Simulate data for functional clustering
-#' @description Generate synthetic data as in the simulation study of Centofanti et al., 2021.
+#' @description Generate synthetic data as in the simulation study of Centofanti et al. (2021).
 #' @param scenario A  character strings indicating the scenario considered. It could be "Scenario I", "Scenario II", and "Scenario III".
 #' @param n_i Number of curves in each cluster.
 #' @param nbasis  The dimension of the set of B-spline functions.
@@ -679,6 +679,10 @@ sasfclust_cv<-function(X=NULL, timeindex=NULL,curve=NULL,grid = NULL, q = 30,lam
 #'  \code{clus}: True cluster membership vector.
 #'
 #' @export
+#' @references
+#' Centofanti, F., Lepore, A., & Palumbo, B. (2021).
+#' Sparse and Smooth Functional Data Clustering.
+#' \emph{arXiv preprint arXiv:2103.15224}.
 #' @examples
 #' library(sasfunclust)
 #' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
