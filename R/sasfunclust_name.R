@@ -25,10 +25,8 @@
 #' @seealso \code{\link{sasfclust}},  \code{\link{sasfclust_cv}}
 #' @examples
 #' \donttest{
-# Plot of original functions
-#'
-#' n_i=20
-#' train<-simulate_data("Scenario I",n_i=n_i,sd = 1,sd2_basis = 0.5^2)
+#' library(sasfunclust)
+#' train<-simulate_data("Scenario I",n_i=20,var_e = 1,var_b = 0.5^2)
 #' lambda_s_seq=10^seq(-4,-3)
 #' lambda_l_seq=10^seq(-1,0)
 #' G_seq=2
@@ -36,10 +34,10 @@
 #' lambda_l_seq = lambda_l_seq,lambda_s_seq =lambda_s_seq,maxit = 5,K_fold = 2,q=10)
 #' plot(mod_cv)
 #'
-#' mod<-sasfclust(X=train$X,grid=train$grid,G_seq=mod_cv$G_opt,
-#' lambda_l = mod_cv$lambda_l_opt,lambda_s_seq =mod_cv$lambda_s_opt,maxit = 5,q=10)
+#' mod<-sasfclust(X=train$X,grid=train$grid,G=mod_cv$G_opt,
+#'  lambda_l = mod_cv$lambda_l_opt,lambda_s =mod_cv$lambda_s_opt,maxit = 5,q=10)
 #'
-#' print(aa$clus$classes)
+#' print(mod$clus$classes)
 #' plot(mod)
 #'}
 "_PACKAGE"

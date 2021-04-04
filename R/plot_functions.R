@@ -43,12 +43,11 @@ plot.sasfclust<-function(x,...){
 
   base::plot(0,type="n",xlim=range,ylim=c(min(mod$mod$data$x),max(mod$mod$data$x)),xlab="",ylab="")
   graphics::title("Classified observations")
+  graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
   for(ii in 1:length(unique(mod$mod$data$curve))){
     graphics::lines(mod$mod$grid[mod$mod$data$timeindex[which(mod$mod$data$curve==ii)]],mod$mod$data$x[which(mod$mod$data$curve==ii)],col=mod$clus[[1]][ii],lty=mod$clus[[1]][ii])
   }
-  graphics::legend("topright",legend = paste0("Cluster ",1:G),lty=1:G,col=1:G)
 
-  return(NULL)
 }
 
 
