@@ -11,23 +11,30 @@ status](https://github.com/unina-sfere/sasfunclust/workflows/R-CMD-check/badge.s
 status](https://travis-ci.com/unina-sfere/sasfunclust.svg?token=zEVZzMQzEwHdN1bmyHeE&branch=main)](https://travis-ci.com/unina-sfere/sasfunclust)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/sasfunclust)](https://CRAN.R-project.org/package=sasfunclust)
-<!-- badges: end --> The package sasfunclust implements the sparse and
-smooth functional clustering (SaS-Funclust) method proposed by
-Centofanti et al. (2021). SaS-Funclust is a new method for clustering
-functional data that aims to classify a sample of curves into
-homogeneous groups while jointly detecting the most informative portions
-of domain. The method relies on a general functional Gaussian mixture
-model whose parameters are estimated by maximizing a log-likelihood
-function penalized with the functional adaptive pairwise fusion penalty
-(FAPFP) and a roughness penalty. The package comprises two main
-functions and . The former performs the SaS-Funclust for fixed number of
-clusters *G*, tuning parameter of the smoothness penalty
-*λ*<sub>*s*</sub>, and tuning parameter of the FAPFP *λ*<sub>*l*</sub>.
-The latter executes the K-fold cross-validation procedure described in
-Centofanti et al. (2021) to choose *G*, *λ*<sub>*s*</sub>, and
-*λ*<sub>*l*</sub>.
+<!-- badges: end -->
+
+The package **sasfunclust** implements the sparse and smooth functional
+clustering (SaS-Funclust) method proposed by Centofanti et al. (2021).
+SaS-Funclust is a new method for clustering functional data that aims to
+classify a sample of curves into homogeneous groups while jointly
+detecting the most informative portions of domain. The method relies on
+a general functional Gaussian mixture model whose parameters are
+estimated by maximizing a log-likelihood function penalized with the
+functional adaptive pairwise fusion penalty (FAPFP) and a roughness
+penalty. The package comprises two main functions and . The former
+performs the SaS-Funclust for fixed number of clusters *G*, tuning
+parameter of the smoothness penalty *λ*<sub>*s*</sub>, and tuning
+parameter of the FAPFP *λ*<sub>*l*</sub>. The latter executes the K-fold
+cross-validation procedure described in Centofanti et al. (2021) to
+choose *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>.
 
 ## Installation
+
+The released version of **sasfunclust** on CRAN can be installed with:
+
+``` r
+install.packages("sasfunclust")
+```
 
 The development version can be installed from
 [GitHub](https://github.com/) with:
