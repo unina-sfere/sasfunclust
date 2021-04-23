@@ -21,12 +21,13 @@ detecting the most informative portions of domain. The method relies on
 a general functional Gaussian mixture model whose parameters are
 estimated by maximizing a log-likelihood function penalized with the
 functional adaptive pairwise fusion penalty (FAPFP) and a roughness
-penalty. The package comprises two main functions and . The former
-performs the SaS-Funclust for fixed number of clusters *G*, tuning
-parameter of the smoothness penalty *λ*<sub>*s*</sub>, and tuning
-parameter of the FAPFP *λ*<sub>*l*</sub>. The latter executes the K-fold
-cross-validation procedure described in Centofanti et al. (2021) to
-choose *G*, *λ*<sub>*s*</sub>, and *λ*<sub>*l*</sub>.
+penalty. The package comprises two main functions `sasfclust` and
+`sasfclust_cv`. The former performs the SaS-Funclust for fixed number of
+clusters *G*, tuning parameter of the smoothness penalty
+*λ*<sub>*s*</sub>, and tuning parameter of the FAPFP *λ*<sub>*l*</sub>.
+The latter executes the K-fold cross-validation procedure described in
+Centofanti et al. (2021) to choose *G*, *λ*<sub>*s*</sub>, and
+*λ*<sub>*l*</sub>.
 
 ## Installation
 
@@ -68,7 +69,7 @@ To apply `sasfclust_cv`, sequences of *G*, *λ*<sub>*s*</sub>, and
 *λ*<sub>*l*</sub> should be defined.
 
 ``` r
-lambda_s_seq=10^seq(-4,-3)
+lambda_s_seq=10^seq(-4,-3) 
 lambda_l_seq=10^seq(0,3)
 G_seq=2
 ```

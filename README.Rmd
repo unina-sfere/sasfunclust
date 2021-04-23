@@ -60,7 +60,7 @@ train<-simulate_data("Scenario I",n_i=n_i,var_e = 1,var_b = 0.5^2)
 
 To apply `sasfclust_cv`,  sequences of $G$, $\lambda_s$, and $\lambda_l$ should be defined.
 ```r
-lambda_s_seq=10^seq(-4,-3)
+lambda_s_seq=10^seq(-4,-3) 
 lambda_l_seq=10^seq(0,3)
 G_seq=2
 ```
